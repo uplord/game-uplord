@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://chcwmiqn55k3k"]
+
+[ext_resource type="Texture2D" uid="uid://7smafvkb8e36" path="res://resources/map-1.png" id="1_oin65"]
+
+[node name="StarterTown" type="Node2D" unique_id=2104887695]
+
+[node name="SpawnPoint" type="Marker2D" parent="." unique_id=1815511667]
+position = Vector2(474, 398)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=998027080]
+position = Vector2(800, 450)
+texture = ExtResource("1_oin65")

@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://dosucdhky2qnu"]
+
+[ext_resource type="Script" uid="uid://bc1mdv3onv7cn" path="res://scripts/maps/MapScreen.gd" id="1_0bxyw"]
+[ext_resource type="Texture2D" uid="uid://37culi1yvo3j" path="res://resources/map-2.png" id="1_2gbus"]
+[ext_resource type="PackedScene" uid="uid://c3ngo3uhlqavj" path="res://scenes/portals/ZonePortal.tscn" id="2_4tvgt"]
+
+[node name="Screen2" type="Node2D" unique_id=488771394]
+script = ExtResource("1_0bxyw")
+player_scale = 0.8
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1656268778]
+position = Vector2(1600, 900)
+scale = Vector2(2, 2)
+texture = ExtResource("1_2gbus")
+
+[node name="ZonePortal2" parent="." unique_id=664315081 instance=ExtResource("2_4tvgt")]
+position = Vector2(1541, 1210)
+target_scene = "uid://bgmlv025qkicr"
+target_spawn_name = "FromScreen2"
+
+[node name="ZonePortal" parent="." unique_id=990994683 instance=ExtResource("2_4tvgt")]
+position = Vector2(1483, 1765)
+target_scene = "uid://bgmlv025qkicr"
+target_spawn_name = "FromScreen2"
+
+[node name="SpawnPoints" type="Node" parent="." unique_id=1913390988]
+
+[node name="FromScreen1" type="Marker2D" parent="SpawnPoints" unique_id=1793373789]
+position = Vector2(1575, 1696)

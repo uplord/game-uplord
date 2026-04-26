@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://cm8c8tpucsn0g"]
+
+[ext_resource type="Script" uid="uid://c63p4kl81l0op" path="res://data/classes/ClassData.gd" id="1_nm0sm"]
+[ext_resource type="Script" uid="uid://byoaoutweqehb" path="res://data/skills/SkillData.gd" id="2_b8hg4"]
+[ext_resource type="Resource" uid="uid://dwliy7v60e74b" path="res://data/skills/slash.tres" id="3_e13la"]
+
+[resource]
+script = ExtResource("1_nm0sm")
+id = "darkknight"
+name = "Dark Knight"
+base_health = 120
+base_mana = 40
+base_attack = 10
+base_defence = 15
+base_speed = 8
+skills = Array[ExtResource("2_b8hg4")]([ExtResource("3_e13la")])

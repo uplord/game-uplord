@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://dwliy7v60e74b"]
+
+[ext_resource type="Script" uid="uid://byoaoutweqehb" path="res://data/skills/SkillData.gd" id="1_dp3ef"]
+
+[resource]
+script = ExtResource("1_dp3ef")
+id = "slash"
+name = "Slash"
+description = "A quick sword attack."
+cooldown = 1.5
+skill_type = "damage"
