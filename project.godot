@@ -11,22 +11,19 @@ config_version=5
 [application]
 
 config/name="Uplord"
-run/main_scene="uid://cmimwyr46v07x"
+run/main_scene="uid://dfsxma8jlju08"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-SceneLoader="*uid://cryvq2guvurd3"
-Game="*uid://dhwt54mp0jv8g"
-IntentoryManager="*uid://yilxpbchmyjp"
-Network="*uid://c7earltu5e0vb"
-PlayerData="*uid://dgqdhs2o2qc"
+SceneManager="*uid://ctabriy8c3tmk"
+GameManager="*uid://dfsxma8jlju08"
 
 [display]
 
-window/size/viewport_width=3299
-window/size/viewport_height=1800
+window/size/viewport_width=1600
+window/size/viewport_height=900
 window/stretch/mode="canvas_items"
 
 [input]

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://wpsjxeghnhop"]
+
+[ext_resource type="Script" uid="uid://bnfqrl84karoc" path="res://Entities/Teleports/SpawnPoint/SpawnPoint.gd" id="1_cqxfc"]
+[ext_resource type="Texture2D" uid="uid://c7va12ws88ieq" path="res://Entities/Teleports/SpawnPoint/Art/spawn.png" id="1_w6iop"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cqxfc"]
+size = Vector2(240, 60)
+
+[node name="SpawnPoint" type="Area2D" unique_id=1129279996]
+script = ExtResource("1_cqxfc")
+
+[node name="Spawn" type="Sprite2D" parent="." unique_id=2105071767]
+modulate = Color(1, 1, 1, 0.23529412)
+texture = ExtResource("1_w6iop")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1951489219]
+shape = SubResource("RectangleShape2D_cqxfc")

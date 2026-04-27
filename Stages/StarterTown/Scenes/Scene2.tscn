@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://r8cd2phd0che"]
+
+[ext_resource type="Texture2D" uid="uid://duaj2f1py1qfo" path="res://Stages/StarterTown/Art/scene-1.png" id="1_54d35"]
+[ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_5mq8b"]
+[ext_resource type="Script" uid="uid://db6vfralb0ujn" path="res://UI/Respawn.gd" id="4_eupq4"]
+
+[node name="Scene2" type="Node2D" unique_id=321670176]
+
+[node name="Background" type="Sprite2D" parent="." unique_id=333577954]
+texture = ExtResource("1_54d35")
+centered = false
+
+[node name="Teleports" type="Node2D" parent="." unique_id=1429842619]
+
+[node name="Teleport1" parent="Teleports" unique_id=1394364578 instance=ExtResource("3_5mq8b")]
+position = Vector2(222, 411)
+target_scene = "Scene1"
+target_teleport = "Teleport3"
+exit_direction = 0
+
+[node name="Teleport2" parent="Teleports" unique_id=555847590 instance=ExtResource("3_5mq8b")]
+position = Vector2(1306, 429)
+target_stage = "TestTown"
+target_scene = "Scene1"
+target_teleport = ""
+exit_direction = 0
+
+[node name="Player" type="Node2D" parent="." unique_id=1083661610]
+
+[node name="Button" type="Button" parent="." unique_id=1398068662]
+custom_minimum_size = Vector2(160, 48)
+offset_left = 778.0
+offset_top = 22.0
+offset_right = 938.0
+offset_bottom = 70.0
+text = "Respawn"
+script = ExtResource("4_eupq4")

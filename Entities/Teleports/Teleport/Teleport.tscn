@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cqwg4n44fyn5t"]
+
+[ext_resource type="Texture2D" uid="uid://d2opmx1v6eilq" path="res://Entities/Teleports/Teleport/Art/teleport.png" id="1_jvjo3"]
+[ext_resource type="Script" uid="uid://djhamtw4ed5gc" path="res://Entities/Teleports/Teleport/Teleport.gd" id="1_p1aum"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jvjo3"]
+size = Vector2(100, 40)
+
+[node name="Teleport" type="Area2D" unique_id=1394364578]
+script = ExtResource("1_p1aum")
+
+[node name="Teleport" type="Sprite2D" parent="." unique_id=710165688]
+texture = ExtResource("1_jvjo3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1803496436]
+shape = SubResource("RectangleShape2D_jvjo3")

@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dln8i38i54imj"]
+
+[ext_resource type="Script" uid="uid://bxdwfpc3382bh" path="res://Entities/Player/Player.gd" id="1_e5kic"]
+[ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_ww0jn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ww0jn"]
+size = Vector2(180, 40)
+
+[node name="Player" type="CharacterBody2D" unique_id=10596515]
+script = ExtResource("1_e5kic")
+
+[node name="Model" type="Node2D" parent="." unique_id=1385571394]
+scale = Vector2(0.25, 0.25)
+
+[node name="Body" type="Node2D" parent="Model" unique_id=1281244017]
+
+[node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=1413598600]
+texture = ExtResource("2_ww0jn")
+offset = Vector2(0, -677)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=894241408]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_ww0jn")
