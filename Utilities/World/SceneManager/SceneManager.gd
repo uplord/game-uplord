@@ -63,6 +63,7 @@ func load_stage(spawn_position := Vector2.INF):
 		player.get_parent().remove_child(player)
 
 	player_parent.add_child(player)
+	selected_stage.set_player(player)
 
 	player.reset_teleport_state()
 

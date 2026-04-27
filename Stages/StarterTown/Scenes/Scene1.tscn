@@ -1,11 +1,14 @@
 [gd_scene format=3 uid="uid://cg41o331tn0v6"]
 
+[ext_resource type="Script" uid="uid://cmj7y8t5t10g" path="res://Stages/BaseStage.gd" id="1_bg2oo"]
 [ext_resource type="Texture2D" uid="uid://duaj2f1py1qfo" path="res://Stages/StarterTown/Art/scene-1.png" id="1_olaji"]
 [ext_resource type="PackedScene" uid="uid://wpsjxeghnhop" path="res://Entities/Teleports/SpawnPoint/SpawnPoint.tscn" id="2_3lljf"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_bg2oo"]
 [ext_resource type="Script" uid="uid://db6vfralb0ujn" path="res://UI/Respawn.gd" id="4_3lljf"]
 
 [node name="Scene1" type="Node2D" unique_id=321670176]
+script = ExtResource("1_bg2oo")
+scene_speed = 1000
 
 [node name="Background" type="Sprite2D" parent="." unique_id=333577954]
 texture = ExtResource("1_olaji")
