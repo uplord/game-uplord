@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://bw6q0fuwjtlp8"]
+
+[ext_resource type="Script" uid="uid://cmj7y8t5t10g" path="res://Stages/BaseStage.gd" id="1_wwv42"]
+[ext_resource type="Texture2D" uid="uid://c1udcjfveplsm" path="res://Stages/ConfigRoom/Art/scene-1.png" id="2_epy44"]
+[ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_xaq3x"]
+[ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="4_evsb7"]
+
+[node name="Scene1" type="Node2D" unique_id=321670176]
+script = ExtResource("1_wwv42")
+player_scale = 1.6
+allow_player_movement = false
+
+[node name="Background" type="Sprite2D" parent="." unique_id=333577954]
+texture = ExtResource("2_epy44")
+centered = false
+
+[node name="Teleports" type="Node2D" parent="." unique_id=1429842619]
+
+[node name="Teleport1" parent="Teleports" unique_id=1394364578 instance=ExtResource("3_xaq3x")]
+position = Vector2(804, 809)
+target_stage = "StarterTown"
+target_scene = "Scene1"
+
+[node name="Player" type="Node2D" parent="." unique_id=1604061505]
+
+[node name="Button" type="Button" parent="." unique_id=317524561]
+custom_minimum_size = Vector2(120, 48)
+offset_left = 1180.0
+offset_top = 199.0
+offset_right = 1300.0
+offset_bottom = 247.0
+text = "Teleport"
+script = ExtResource("4_evsb7")
+target_stage = "StarterTown"
+target_scene = "Scene1"
+
+[node name="Label" type="Label" parent="." unique_id=13850564]
+offset_left = 278.0
+offset_top = 87.0
+offset_right = 318.0
+offset_bottom = 110.0
+text = "Config Room"

@@ -2,5 +2,23 @@
 
 [ext_resource type="Script" uid="uid://nagkfeikftwl" path="res://Utilities/World/SceneManager/SceneManager.gd" id="1_fhadj"]
 
+[sub_resource type="GDScript" id="GDScript_bh47u"]
+script/source = "extends Button
+
+func _pressed():
+	SceneManager.respawn_player()
+"
+
 [node name="SceneManager" type="Node" unique_id=309241273]
 script = ExtResource("1_fhadj")
+
+[node name="World" type="Node" parent="." unique_id=1126608124]
+
+[node name="Button2" type="Button" parent="." unique_id=593927288]
+custom_minimum_size = Vector2(160, 48)
+offset_left = 762.0
+offset_top = 46.0
+offset_right = 922.0
+offset_bottom = 94.0
+text = "Respawn"
+script = SubResource("GDScript_bh47u")

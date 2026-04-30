@@ -6,3 +6,18 @@
 script = ExtResource("1_j3pce")
 
 [node name="SceneContainer" type="Node" parent="." unique_id=723358073]
+
+[node name="UI" type="Control" parent="." unique_id=2016092514]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Repawn" type="Button" parent="UI" unique_id=1407557553]
+custom_minimum_size = Vector2(160, 48)
+layout_mode = 0
+offset_left = 762.0
+offset_top = 46.0
+offset_right = 922.0
+offset_bottom = 94.0
+text = "Respawn"
+
+[connection signal="pressed" from="UI/Repawn" to="." method="_on_repawn_pressed"]

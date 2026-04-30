@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://du2xkdk4rayq1"]
+
+[ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="1_gj7jy"]
+
+[node name="Button" type="Node2D" unique_id=1188977838]
+
+[node name="Button" type="Button" parent="." unique_id=384034567]
+custom_minimum_size = Vector2(120, 48)
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Teleport
+"
+script = ExtResource("1_gj7jy")
