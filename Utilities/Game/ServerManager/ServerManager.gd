@@ -178,7 +178,6 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 		"c_spawn_player":
 			var spawn_position = SceneManager.spawn_player_random_unused()
-			print("c_spawn_player", data)
 			remote_players[client_id] = {
 				"position": spawn_position,
 				"direction": SceneManager.player.get_direction()
@@ -278,8 +277,7 @@ func handle_client_packet(data: Dictionary):
 			emit_signal("server_ready")
 
 		"s_remote_players":
-			print("remote_players: ", data.remote_players)
-			SceneManager.load_remote_players(data.remote_players)
+			SceneManager._load_remote_players(data.remote_players)
 
 		"s_remote_move":
-			SceneManager.move_remote_players(data.remote_players)
+			SceneManager._move_remote_players(data.remote_players)

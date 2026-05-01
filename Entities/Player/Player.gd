@@ -69,6 +69,15 @@ func get_direction():
 # -------------------------
 func respawn(spawn_position: Vector2):
 	global_position = spawn_position
+	body.scale.x = -1
+	
+	get_tree().create_timer(0.2).timeout.connect(func():
+		ServerManager.send_to_server({
+			"type": "c_move_player",
+			"position": global_position,
+			"direction": body.scale.x,
+		})
+	)
 
 # -------------------------
 # TELEPORT CONTROL
