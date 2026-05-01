@@ -48,7 +48,7 @@ func _physics_process(_delta):
 
 		ServerManager.send_to_server({
 			"type": "c_move_player",
-			"position": velocity,
+			"position": global_position,
 			"direction": body.scale.x,
 		})
 	else:

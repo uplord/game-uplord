@@ -8,6 +8,7 @@ const HEARTBEAT_TIMEOUT = 3.0
 
 var peer: ENetMultiplayerPeer
 var is_server: bool = false
+var local_peer_id: int = -1
 
 var connected_clients: Dictionary = {}
 var remote_players: Dictionary = {} 
@@ -133,6 +134,8 @@ func broadcast_except(excluded_id: int, data: Dictionary) -> void:
 		_send(data, client_id)
 
 func get_local_peer_id() -> int:
+	if local_peer_id != -1:
+		return local_peer_id
 	if peer == null:
 		return -1
 	return peer.get_unique_id()
@@ -162,6 +165,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 			send_to_client(client_id, {
 				"type": "s_handshake_ack",
+				"client_id": client_id,
 			})
 
 		"c_heartbeat":
@@ -196,6 +200,11 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"position": data.position,
 				"direction": data.direction,
 			}
+			
+			broadcast({
+				"type": "s_remote_move",
+				"remote_players": remote_players,
+			})
 
 
 func check_heartbeats():
@@ -252,11 +261,6 @@ func start_client(ip_address: String = "127.0.0.1", port: int = 9000) -> void:
 func handle_client_packet(data: Dictionary):
 	match data.type:
 
-		"s_handshake_ack":
-			connected = true
-			print("Handshake confirmed!")
-			emit_signal("server_ready")
-
 		"s_remove":
 			print("Server removed peer: ", data.id)
 		
@@ -266,6 +270,16 @@ func handle_client_packet(data: Dictionary):
 			SceneManager.player.stop_movement()
 			SceneManager.player.set_facing(Vector2(1, 0))
 
+		"s_handshake_ack":
+			connected = true
+			print("Handshake confirmed!")
+			if data.has("client_id"):
+				local_peer_id = data.client_id
+			emit_signal("server_ready")
+
 		"s_remote_players":
 			print("remote_players: ", data.remote_players)
 			SceneManager.load_remote_players(data.remote_players)
+
+		"s_remote_move":
+			SceneManager.move_remote_players(data.remote_players)

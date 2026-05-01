@@ -136,13 +136,33 @@ func respawn_player():
 
 	load_stage(Vector2.INF)
 
-func load_remote_players(remote_players):
+func _get_or_create_remote_player(parent: Node, client_id: int) -> Node2D:
+	var name := "RemotePlayer_%d" % client_id
+	var remote_player := parent.get_node_or_null(name)
+
+	if remote_player == null:
+		remote_player = remote_player_scene.instantiate()
+		remote_player.name = name
+		parent.add_child(remote_player)
+
+	return remote_player
+
+func _apply_remote_player_state(remote_player: Node2D, player_data: Dictionary) -> void:
+	if player_data.has("position"):
+		remote_player.global_position = player_data.position
+
+	if player_data.has("direction"):
+		remote_player.scale.x = player_data.direction
+
+func load_remote_players(remote_players: Dictionary) -> void:
 	var remote_player_parent = selected_stage.get_node_or_null("RemotePlayers")
+
 	if remote_player_parent == null:
 		remote_player_parent = Node2D.new()
 		remote_player_parent.name = "RemotePlayers"
 		selected_stage.add_child(remote_player_parent)
 
+	# clear existing
 	for child in remote_player_parent.get_children():
 		child.queue_free()
 
@@ -152,14 +172,22 @@ func load_remote_players(remote_players):
 		if client_id == local_id:
 			continue
 
-		var player_data = remote_players[client_id]
-		var remote_player = remote_player_scene.instantiate()
-		remote_player.name = "RemotePlayer_%d" % client_id
+		var remote_player = _get_or_create_remote_player(remote_player_parent, client_id)
+		_apply_remote_player_state(remote_player, remote_players[client_id])
 
-		if player_data.has("position"):
-			remote_player.global_position = player_data.position
-			remote_player.scale.x = player_data.direction
-		remote_player_parent.add_child(remote_player)
+func move_remote_players(remote_players: Dictionary) -> void:
+	var remote_player_parent = selected_stage.get_node_or_null("RemotePlayers")
+	if remote_player_parent == null:
+		return
+
+	var local_id = ServerManager.get_local_peer_id()
+
+	for client_id in remote_players.keys():
+		if client_id == local_id:
+			continue
+
+		var remote_player = _get_or_create_remote_player(remote_player_parent, client_id)
+		_apply_remote_player_state(remote_player, remote_players[client_id])
 
 # ==================================================
 # TELEPORT SYSTEM (NEW)
