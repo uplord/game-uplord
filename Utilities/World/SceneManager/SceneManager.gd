@@ -12,6 +12,7 @@ var selected_stage: Node
 var player_scene = preload("res://Entities/Player/Player.tscn")
 var remote_player_scene = preload("res://Entities/RemotePlayer/RemotePlayer.tscn")
 var player: Node2D
+var available_spawn_points: Array = []
 
 var scene_transitioning := false
 
@@ -102,16 +103,27 @@ func spawn_player_random_unused():
 	if spawn_parent == null :
 		return Vector2.ZERO
 
-	var available = []
+	available_spawn_points.clear()
 
 	for spawn in spawn_parent.get_children():
-		if spawn is Area2D and not spawn.occupied:
-			available.append(spawn)
+		if spawn is Area2D:
+			var occupied = spawn.occupied
+			if not occupied and ServerManager.is_server:
+				occupied = _is_spawn_position_used(spawn.global_position)
+			if not occupied:
+				available_spawn_points.append(spawn)
 
-	if available.is_empty():
+	if available_spawn_points.is_empty():
 		return Vector2.ZERO
 
-	return available.pick_random().global_position
+	return available_spawn_points.pick_random().global_position
+
+func _is_spawn_position_used(spawn_position: Vector2) -> bool:
+	for player_data in ServerManager.remote_players.values():
+		if player_data is Dictionary and player_data.has("position"):
+			if player_data.position.distance_to(spawn_position) < 32:
+				return true
+	return false
 
 
 func respawn_player():
@@ -131,13 +143,22 @@ func load_remote_players(remote_players):
 		remote_player_parent.name = "RemotePlayers"
 		selected_stage.add_child(remote_player_parent)
 
+	for child in remote_player_parent.get_children():
+		child.queue_free()
+
+	var local_id = ServerManager.get_local_peer_id()
+
 	for client_id in remote_players.keys():
+		if client_id == local_id:
+			continue
+
 		var player_data = remote_players[client_id]
 		var remote_player = remote_player_scene.instantiate()
 		remote_player.name = "RemotePlayer_%d" % client_id
 
 		if player_data.has("position"):
 			remote_player.global_position = player_data.position
+			remote_player.scale.x = player_data.direction
 		remote_player_parent.add_child(remote_player)
 
 # ==================================================

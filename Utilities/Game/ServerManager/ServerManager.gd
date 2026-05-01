@@ -132,6 +132,11 @@ func broadcast_except(excluded_id: int, data: Dictionary) -> void:
 
 		_send(data, client_id)
 
+func get_local_peer_id() -> int:
+	if peer == null:
+		return -1
+	return peer.get_unique_id()
+
 # -------------------------
 # SERVER
 # -------------------------

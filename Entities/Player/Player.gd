@@ -54,6 +54,8 @@ func _physics_process(_delta):
 	else:
 		velocity = Vector2.ZERO
 
+	z_index = int(global_position.y)
+
 
 func stop_movement():
 	velocity = Vector2.ZERO
