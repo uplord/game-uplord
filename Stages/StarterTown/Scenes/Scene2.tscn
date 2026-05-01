@@ -24,5 +24,3 @@ position = Vector2(1306, 429)
 target_stage = "TestTown"
 target_scene = "Scene1"
 target_teleport = ""
-
-[node name="Player" type="Node2D" parent="." unique_id=1083661610]

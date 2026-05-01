@@ -21,8 +21,6 @@ position = Vector2(804, 809)
 target_stage = "StarterTown"
 target_scene = "Scene1"
 
-[node name="Player" type="Node2D" parent="." unique_id=1604061505]
-
 [node name="Button" type="Button" parent="." unique_id=317524561]
 custom_minimum_size = Vector2(120, 48)
 offset_left = 1180.0

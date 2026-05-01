@@ -33,5 +33,3 @@ target_scene = "Scene1"
 [node name="Teleport3" parent="Teleports" unique_id=2092888474 instance=ExtResource("3_bg2oo")]
 position = Vector2(1406, 388)
 target_scene = "Scene2"
-
-[node name="Player" type="Node2D" parent="." unique_id=1232717083]

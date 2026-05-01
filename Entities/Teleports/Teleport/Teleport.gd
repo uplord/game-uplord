@@ -22,10 +22,11 @@ func _on_body_entered(body):
 		dir = Vector2.LEFT
 
 	get_tree().create_timer(0.0).timeout.connect(func():
-		SceneManager.teleport_player(
-			target_stage,
-			target_scene,
-			target_teleport,
-			dir
-		)
+		print("teleport_player")
+		#SceneManager.teleport_player(
+			#target_stage,
+			#target_scene,
+			#target_teleport,
+			#dir
+		#)
 	)

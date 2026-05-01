@@ -45,6 +45,12 @@ func _physics_process(_delta):
 		# ✅ only flip when actually moving
 		if abs(velocity.x) > 5:
 			body.scale.x = 1 if velocity.x < 0 else -1
+
+		ServerManager.send_to_server({
+			"type": "c_move_player",
+			"position": velocity,
+			"direction": body.scale.x,
+		})
 	else:
 		velocity = Vector2.ZERO
 
@@ -53,27 +59,14 @@ func stop_movement():
 	velocity = Vector2.ZERO
 	has_target = false
 
+func get_direction():
+	return body.scale.x
 
 # -------------------------
 # RESPawn FIXED
 # -------------------------
 func respawn(spawn_position: Vector2):
-	movement_enabled = false
-	spawn_protection = true
-
 	global_position = spawn_position
-	stop_movement()
-
-	set_facing(Vector2(1, 0)) # force LEFT on respawn
-
-	lock_teleport()
-
-	await get_tree().create_timer(0.2).timeout
-
-	spawn_protection = false
-	unlock_teleport()
-	movement_enabled = true
-
 
 # -------------------------
 # TELEPORT CONTROL

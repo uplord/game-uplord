@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dcvpvvfno2yyb"]
+
+[ext_resource type="Script" uid="uid://cee2qvkd2ut01" path="res://Entities/RemotePlayer/RemotePlayer.gd" id="1_xx3ee"]
+[ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_lkt0a"]
+
+[node name="Player" type="Node2D" unique_id=2069247346]
+script = ExtResource("1_xx3ee")
+
+[node name="Model" type="Node2D" parent="." unique_id=1385571394]
+scale = Vector2(0.25, 0.25)
+
+[node name="Body" type="Node2D" parent="Model" unique_id=1281244017]
+
+[node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=1413598600]
+texture = ExtResource("2_lkt0a")
+offset = Vector2(0, -677)

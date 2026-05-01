@@ -7,17 +7,13 @@ var stage_loaded := false
 
 func _ready():
 	SceneManager.setup(container)
-	
 	ui.visible = false
 	
 	ServerManager.server_lost.connect(_on_server_lost)
-
-	if ServerManager.is_ready():
-		SceneManager.load_stage()
-		return
-
 	ServerManager.server_ready.connect(_on_server_ready)
 
+	if ServerManager.is_ready():
+		_on_server_ready()
 
 func _on_server_ready():
 	if stage_loaded:

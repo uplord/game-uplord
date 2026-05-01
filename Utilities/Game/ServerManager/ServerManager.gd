@@ -8,8 +8,10 @@ const HEARTBEAT_TIMEOUT = 3.0
 
 var peer: ENetMultiplayerPeer
 var is_server: bool = false
+
 var connected_clients: Dictionary = {}
 var remote_players: Dictionary = {} 
+var scene_data: Dictionary = {} 
 
 var hb_timer: Timer
 var connected: bool = false
@@ -119,6 +121,16 @@ func send_to_client(client_id: int, data: Dictionary) -> void:
 func broadcast(data: Dictionary) -> void:
 	_send(data, 0)
 
+# SERVER → ALL CLIENTS EXCEPT ONE
+func broadcast_except(excluded_id: int, data: Dictionary) -> void:
+	if peer == null:
+		return
+
+	for client_id in connected_clients.keys():
+		if client_id == excluded_id:
+			continue
+
+		_send(data, client_id)
 
 # -------------------------
 # SERVER
@@ -141,9 +153,10 @@ func handle_server_packet(client_id: int, data: Dictionary):
 		"c_handshake":
 			print("Handshake: ", client_id)
 			connected_clients[client_id] = 0.0
+			remote_players[client_id] = {}
 
 			send_to_client(client_id, {
-				"type": "s_handshake_ack"
+				"type": "s_handshake_ack",
 			})
 
 		"c_heartbeat":
@@ -154,22 +167,30 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			print("Client requested leave: ", client_id)
 			handle_disconnect(client_id, "requested leave")
 
-		"c_msg":
-			print("Client message: ", data.text)
+		"c_spawn_player":
+			var spawn_position = SceneManager.spawn_player_random_unused()
+			print("c_spawn_player", data)
+			remote_players[client_id] = {
+				"position": spawn_position,
+				"direction": SceneManager.player.get_direction()
+			}
 
-		"c_private_msg":
-			print("Private request from: ", client_id)
 			send_to_client(client_id, {
-				"type": "s_private_msg",
-				"text": data.text
+				"type": "s_spawn_player",
+				"spawn_position": spawn_position,
+			})
+			
+			broadcast({
+				"type": "s_remote_players",
+				"remote_players": remote_players,
 			})
 
-		"c_msg_all":
-			print("All message: ", data.text)
-			broadcast({
-				"type": "s_msg",
-				"text": data.text
-			})
+
+		"c_move_player":
+			remote_players[client_id] = {
+				"position": data.position,
+				"direction": data.direction,
+			}
 
 
 func check_heartbeats():
@@ -233,33 +254,13 @@ func handle_client_packet(data: Dictionary):
 
 		"s_remove":
 			print("Server removed peer: ", data.id)
+		
+		"s_spawn_player":
+			SceneManager.player.reset_teleport_state()
+			SceneManager.player.respawn(data.spawn_position)
+			SceneManager.player.stop_movement()
+			SceneManager.player.set_facing(Vector2(1, 0))
 
-		"s_private_msg":
-			print("Private message: ", data.text)
-
-		"s_msg":
-			print("Server message: ", data.text)
-
-
-# -------------------------
-# UI BUTTONS
-# -------------------------
-#func _on_button_pressed() -> void:
-#	if connected:
-#		send_to_server({
-#			"type": "c_msg",
-#			"text": "Testing"
-#		})
-#
-#func _on_button_2_pressed() -> void:
-#	if connected:
-#		send_to_server({
-#			"type": "c_private_msg",
-#			"text": "Testing"
-#		})
-#
-#func _on_button_3_pressed() -> void:
-#	send_to_server({
-#		"type": "c_msg_all",
-#		"text": "Testing2"
-#	})
+		"s_remote_players":
+			print("remote_players: ", data.remote_players)
+			SceneManager.load_remote_players(data.remote_players)
