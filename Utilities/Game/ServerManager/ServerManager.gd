@@ -219,6 +219,14 @@ func handle_disconnect(client_id: int, reason: String) -> void:
 		connected_clients.erase(client_id)
 
 	print("Client removed: ", client_id, " | Reason: ", reason)
+	
+	if remote_players.has(client_id):
+		remote_players.erase(client_id)
+
+	broadcast({
+		"type": "s_remote_players",
+		"remote_players": remote_players,
+	})
 
 	broadcast({
 		"type": "s_remove",

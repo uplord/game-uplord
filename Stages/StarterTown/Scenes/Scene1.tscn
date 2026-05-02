@@ -29,7 +29,9 @@ position = Vector2(1059, 772)
 position = Vector2(222, 411)
 target_stage = "ConfigRoom"
 target_scene = "Scene1"
+teleport_direction = 4
 
 [node name="Teleport3" parent="Teleports" unique_id=2092888474 instance=ExtResource("3_bg2oo")]
-position = Vector2(1406, 388)
+position = Vector2(1473, 481)
 target_scene = "Scene2"
+teleport_direction = 3
