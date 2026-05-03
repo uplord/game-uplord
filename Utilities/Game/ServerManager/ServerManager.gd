@@ -177,33 +177,44 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			handle_disconnect(client_id, "requested leave")
 
 		"c_spawn_player":
+			print("c_spawn_player")
+
 			var spawn_position = SceneManager.spawn_player_random_unused()
+
 			remote_players[client_id] = {
 				"position": spawn_position,
-				"direction": SceneManager.player.get_direction()
+				"direction": SceneManager.player.get_direction(),
+				"stage": SceneManager.current_stage,
+				"scene": SceneManager.current_scene,
+				"room": SceneManager.current_stage + ":" + SceneManager.current_scene
 			}
 
 			send_to_client(client_id, {
 				"type": "s_spawn_player",
 				"spawn_position": spawn_position,
 			})
-			
-			broadcast({
-				"type": "s_remote_players",
-				"remote_players": remote_players,
-			})
+
+			for id in connected_clients.keys():
+				send_to_client(id, {
+					"type": "s_remote_players",
+					"remote_players": _get_players_in_same_instance(id)
+				})
 
 
 		"c_move_player":
 			remote_players[client_id] = {
 				"position": data.position,
 				"direction": data.direction,
+				"stage": data.stage,
+				"scene": data.scene,
+				"room": data.stage + ":" + data.scene
 			}
-			
-			broadcast({
-				"type": "s_remote_move",
-				"remote_players": remote_players,
-			})
+
+			for id in connected_clients.keys():
+				send_to_client(id, {
+					"type": "s_remote_move",
+					"remote_players": _get_players_in_same_instance(id),
+				})
 
 
 func check_heartbeats():
@@ -251,6 +262,28 @@ func handle_server_disconnect():
 		peer.close()
 		peer = null
 
+func _get_players_in_same_instance(client_id: int) -> Dictionary:
+	var result := {}
+
+	if not remote_players.has(client_id):
+		return result
+
+	var client_data = remote_players[client_id]
+
+	if not client_data.has("stage") or not client_data.has("scene"):
+		return result
+
+	for id in remote_players.keys():
+		var data = remote_players[id]
+
+		if not data.has("stage") or not data.has("scene"):
+			continue
+
+		if data.stage == client_data.stage and data.scene == client_data.scene:
+			result[id] = data
+
+	return result
+
 # -------------------------
 # CLIENT
 # -------------------------
@@ -289,3 +322,4 @@ func handle_client_packet(data: Dictionary):
 
 		"s_remote_move":
 			SceneManager._move_remote_players(data.remote_players)
+			

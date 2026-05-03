@@ -14,13 +14,15 @@ centered = false
 [node name="Teleports" type="Node2D" parent="." unique_id=1429842619]
 
 [node name="Teleport1" parent="Teleports" unique_id=1394364578 instance=ExtResource("3_5mq8b")]
-position = Vector2(222, 411)
+position = Vector2(198, 669)
+target_stage = "StarterTown"
 target_scene = "Scene1"
 target_teleport = "Teleport3"
 exit_direction = 0
+teleport_direction = 7
 
 [node name="Teleport2" parent="Teleports" unique_id=555847590 instance=ExtResource("3_5mq8b")]
 position = Vector2(1306, 429)
 target_stage = "TestTown"
 target_scene = "Scene1"
-target_teleport = ""
+teleport_direction = 4

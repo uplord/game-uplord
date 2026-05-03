@@ -3,7 +3,7 @@ extends Area2D
 @onready var sprite: Sprite2D = $Direction
 
 enum ExitDirection { LEFT, RIGHT }
-enum TeleportDirection { UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
+enum TeleportDirection { BASE, UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
 
 @export var target_stage: String = ""
 @export var target_scene: String = ""
@@ -28,17 +28,17 @@ func _on_body_entered(body):
 		dir = Vector2.LEFT
 
 	get_tree().create_timer(0.0).timeout.connect(func():
-		print("teleport_player")
-		#SceneManager.teleport_player(
-			#target_stage,
-			#target_scene,
-			#target_teleport,
-			#dir
-		#)
+		SceneManager.teleport_player(
+			target_stage,
+			target_scene,
+			target_teleport,
+			dir
+		)
 	)
 	
 func get_texture_from_direction(dir: TeleportDirection) -> Texture2D:
 	var name_map := {
+		TeleportDirection.BASE: "Base",
 		TeleportDirection.UP: "Up",
 		TeleportDirection.DOWN: "Down",
 		TeleportDirection.LEFT: "Left",

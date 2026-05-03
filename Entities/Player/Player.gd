@@ -50,6 +50,8 @@ func _physics_process(_delta):
 			"type": "c_move_player",
 			"position": global_position,
 			"direction": body.scale.x,
+			"stage": SceneManager.current_stage,
+			"scene": SceneManager.current_scene,
 		})
 	else:
 		velocity = Vector2.ZERO
@@ -77,6 +79,8 @@ func respawn(spawn_position: Vector2):
 		"type": "c_move_player",
 		"position": global_position,
 		"direction": body.scale.x,
+		"stage": SceneManager.current_stage,
+		"scene": SceneManager.current_scene,
 	})
 
 # -------------------------
