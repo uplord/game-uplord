@@ -12,7 +12,6 @@ var local_peer_id: int = -1
 
 var connected_clients: Dictionary = {}
 var remote_players: Dictionary = {} 
-var scene_data: Dictionary = {} 
 
 var hb_timer: Timer
 var connected: bool = false
@@ -21,7 +20,7 @@ var heartbeat_timer: float = 0.0
 
 var spawn_points: Array = []
 var used_spawn_ids: Dictionary = {}
-
+var spawn_radius := 64
 
 # -------------------------
 # INIT
@@ -155,6 +154,56 @@ func start_server(port: int = 9000) -> void:
 	print("Server started:", port)
 	is_server = true
 
+# ==================================================
+# SPAWN SYSTEM (ONLY AUTHORITY HERE)
+# ==================================================
+
+func get_available_spawn_points() -> Array:
+	if spawn_points.is_empty():
+		spawn_points = SceneManager.get_spawn_points_for_room()
+	return spawn_points
+
+
+func get_spawn_position(client_id: int) -> Vector2:
+	var points = get_available_spawn_points()
+	if points.is_empty():
+		return Vector2.ZERO
+
+	var available := []
+
+	for i in range(points.size()):
+		if not used_spawn_ids.values().has(i):
+			available.append(i)
+
+	var chosen: int
+	if available.is_empty():
+		chosen = randi() % points.size()
+	else:
+		chosen = available.pick_random()
+
+	used_spawn_ids[client_id] = chosen
+	return points[chosen]
+
+func get_spawn_position_unassigned() -> Vector2:
+	var points = get_available_spawn_points()
+	if points.is_empty():
+		return Vector2.ZERO
+
+	# IMPORTANT: no mutation of used_spawn_ids
+	var available := []
+
+	for i in range(points.size()):
+		if not used_spawn_ids.values().has(i):
+			available.append(points[i])
+
+	if available.is_empty():
+		return points[randi() % points.size()]
+
+	return available.pick_random()
+
+# ==================================================
+# SERVER PACKETS
+# ==================================================
 
 func handle_server_packet(client_id: int, data: Dictionary):
 	match data.type:
@@ -185,10 +234,9 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 			# 🔥 Ensure spawn points are loaded
 			if spawn_points.is_empty():
-				spawn_points = get_spawn_points_for_room()
+				spawn_points = SceneManager.get_spawn_points_for_room()
 
-			var spawn_id = pick_spawn(client_id)
-			var spawn_position = spawn_points[spawn_id]
+			var spawn_position = get_spawn_position(client_id)
 
 			remote_players[client_id] = {
 				"position": spawn_position,
@@ -202,6 +250,9 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"spawn_position": spawn_position,
 			})
 
+			var test = _get_players_in_same_instance(client_id)
+			print("test: ", test)
+			
 			# for id in connected_clients.keys():
 			# 	send_to_client(id, {
 			# 		"type": "s_remote_players",
@@ -210,10 +261,79 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 
 		"c_move_player":
-			if used_spawn_ids.has(client_id):
-				used_spawn_ids.erase(client_id)
-			# print("c_move_player")
+			var player_pos = data.position
 
+			if used_spawn_ids.has(client_id):
+				var spawn_id = used_spawn_ids[client_id]
+				var spawn_pos = spawn_points[spawn_id]
+
+				if player_pos.distance_to(spawn_pos) > spawn_radius:
+					used_spawn_ids.erase(client_id)
+
+		"c_teleport_player":
+			var stage = data.stage
+			var scene = data.scene
+			var teleport = data.teleport
+			var exit_dir = data.direction
+
+			var target_stage = stage if stage != "" else SceneManager.current_stage
+			var target_scene = scene if scene != "" else SceneManager.current_scene
+
+			var position = SceneManager.resolve_teleport_position(
+				target_stage,
+				target_scene,
+				teleport
+			)
+
+			if position == Vector2.ZERO:
+				if used_spawn_ids.has(client_id):
+					used_spawn_ids.erase(client_id)
+				
+				if spawn_points.is_empty():
+					spawn_points = SceneManager.get_spawn_points_for_room()
+
+				position = get_spawn_position(client_id)
+
+			remote_players[client_id] = {
+				"position": position,
+				"direction": exit_dir,
+				"stage": target_stage,
+				"scene": target_scene,
+			}
+
+			send_to_client(client_id, {
+				"type": "s_teleport_player",
+				"position": position,
+				"direction": exit_dir,
+				"stage": target_stage,
+				"scene": target_scene,
+			})
+
+func _get_players_in_same_instance(client_id: int) -> Dictionary:
+	var result := {}
+
+	if not remote_players.has(client_id):
+		return result
+
+	var client_data = remote_players[client_id]
+
+	if not client_data.has("stage"):
+		return result
+
+	for id in remote_players.keys():
+		var data = remote_players[id]
+
+		if not data.has("stage"):
+			continue
+
+		if data.stage == client_data.stage:
+			result[id] = data
+
+	return result
+
+# ==================================================
+# DISCONNECT / HEARTBEAT
+# ==================================================
 
 func check_heartbeats():
 	for client_id in connected_clients.keys().duplicate():
@@ -255,44 +375,6 @@ func handle_server_disconnect():
 		peer.close()
 		peer = null
 
-func get_spawn_points_for_room():
-	var scene = SceneManager.selected_stage
-	if scene == null:
-		return []
-
-	var spawn_parent = scene.get_node_or_null("SpawnPoints")
-	if spawn_parent == null:
-		return []
-
-	var points := []
-
-	for spawn in spawn_parent.get_children():
-		if spawn is Area2D:
-			points.append(spawn.global_position)
-
-	return points
-
-
-func pick_spawn(client_id: int) -> int:
-	var available := []
-
-	for i in range(spawn_points.size()):
-		if not used_spawn_ids.values().has(i):
-			available.append(i)
-
-	var chosen: int
-
-	print("available: ", available)
-
-	if available.is_empty():
-		chosen = randi() % spawn_points.size()
-	else:
-		chosen = available.pick_random()
-
-	print("chosen: ", chosen)
-
-	used_spawn_ids[client_id] = chosen
-	return chosen
 
 
 # -------------------------
@@ -317,6 +399,7 @@ func handle_client_packet(data: Dictionary):
 		
 		"s_spawn_player":
 			SceneManager.player.reset_teleport_state()
+			SceneManager.player.visible = true
 			SceneManager.player.respawn(data.spawn_position)
 			SceneManager.player.stop_movement()
 			SceneManager.player.set_facing(Vector2(1, 0))
@@ -334,4 +417,12 @@ func handle_client_packet(data: Dictionary):
 		"s_remote_move":
 			print("s_remote_move")
 			#SceneManager._move_remote_players(data.remote_players)
+
+		"s_teleport_player":
+			SceneManager.apply_teleport(
+				data.stage,
+				data.scene,
+				data.position,
+				data.direction
+			)
 			

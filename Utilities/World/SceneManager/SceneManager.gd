@@ -14,19 +14,7 @@ var remote_player_scene = preload("res://Entities/RemotePlayer/RemotePlayer.tscn
 
 var player: Node2D
 var spawn_requested := false
-
-# var label_stage: Label = null
-# var label_scene: Label = null
-# var label_stage_count: Label = null
-
 var scene_transitioning := false
-
-# ==================================================
-# REMOTE PLAYER SYNC STATE (FIX)
-# ==================================================
-# var remote_players_buffer: Dictionary = {}
-# var remote_players_ready := false
-
 
 func setup(scene_container: Node):
 	container = scene_container
@@ -43,6 +31,7 @@ func unload_stage() -> void:
 # STAGE LOADING
 # ==================================================
 func load_stage(spawn_position := Vector2.INF):
+
 	if container == null:
 		print("SceneLoader error: container has not been set.")
 		return null
@@ -92,6 +81,11 @@ func load_stage(spawn_position := Vector2.INF):
 	player_parent.add_child(player)
 	selected_stage.set_player(player)
 
+	if spawn_position == Vector2.INF:
+		player.visible = false
+
+	if spawn_position != Vector2.INF:
+		player.global_position = spawn_position
 
 	# SPAWN
 	if spawn_position == Vector2.INF and not spawn_requested:
@@ -116,68 +110,84 @@ func respawn_player():
 	if same_location:
 		ServerManager.send_to_server({ "type": "c_spawn_player" })
 	else:
+		spawn_requested = false
 		current_stage = default_stage
 		current_scene = default_scene
 
 		load_stage(Vector2.INF)
 
-# REMOTE PLAYERS
 
-func _get_remote_parent() -> Node:
-	if selected_stage == null:
-		return null
-
-	var parent = selected_stage.get_node_or_null("RemotePlayers")
-
-	if parent == null:
-		parent = Node2D.new()
-		parent.name = "RemotePlayers"
-		selected_stage.add_child(parent)
-
-	return parent
-
-func _get_or_create_remote_player(parent: Node, client_id: int) -> Node2D:
-	var node_name := "RemotePlayer_%d" % client_id
-	var remote_player := parent.get_node_or_null(node_name)
-
-	if remote_player == null:
-		remote_player = remote_player_scene.instantiate()
-		remote_player.name = node_name
-		parent.add_child(remote_player)
-
-	return remote_player
-
-func _apply_remote_player_state(remote_player: Node2D, data: Dictionary) -> void:
-	if data.has("position"):
-		remote_player.global_position = data.position
-	
-func _load_remote_players(remote_players: Dictionary) -> void:
-	var parent = _get_remote_parent()
-	if parent == null:
+func apply_teleport(stage: String, scene: String, position: Vector2, exit_direction: Vector2):
+	if player == null:
 		return
 
-	var local_id = ServerManager.get_local_peer_id()
-	var valid_ids := {}
+	var stage_changed := stage != current_stage or scene != current_scene
 
-	for client_id in remote_players.keys():
-		if client_id == local_id:
-			continue
+	current_stage = stage
+	current_scene = scene
 
-		valid_ids[client_id] = true
+	# MOVE + LOAD
+	if stage_changed:
+		load_stage(position)
+	else:
+		player.global_position = position
 
-		var remote_player = _get_or_create_remote_player(parent, client_id)
+	player.set_facing(exit_direction)
+	player.unlock_teleport()
 
-		_apply_remote_player_state(remote_player, remote_players[client_id])
+func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT):
+	if scene_transitioning:
+		return
 
-		# 🔥 FORCE VISUAL STATE (important fix)
-		remote_player.visible = true
-		remote_player.process_mode = Node.PROCESS_MODE_INHERIT
-	
-	# remove stale players
-	for child in parent.get_children():
-		if child.name.begins_with("RemotePlayer_"):
-			var id_str = child.name.replace("RemotePlayer_", "")
-			var id = int(id_str)
+	if player == null:
+		return
 
-			if not valid_ids.has(id):
-				child.queue_free()
+	if player.spawn_protection or not player.can_teleport:
+		return
+
+	player.lock_teleport()
+	player.stop_movement()
+
+	# send request to server ONLY
+	ServerManager.send_to_server({
+		"type": "c_teleport_player",
+		"stage": target_stage,
+		"scene": target_scene,
+		"teleport": target_teleport,
+		"direction": exit_direction,
+	})
+
+func get_spawn_points_for_room() -> Array:
+	if selected_stage == null:
+		return []
+
+	var spawn_parent = selected_stage.get_node_or_null("SpawnPoints")
+	if spawn_parent == null:
+		return []
+
+	var points := []
+
+	for spawn in spawn_parent.get_children():
+		if spawn is Area2D:
+			points.append(spawn.global_position)
+
+	return points
+
+func resolve_teleport_position(stage: String, scene: String, teleport_name: String) -> Vector2:
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [stage, scene]
+	var packed = load(path)
+
+	if packed == null:
+		return Vector2.ZERO
+
+	var temp_scene = packed.instantiate()
+
+	if teleport_name != null and teleport_name != "":
+		var node = temp_scene.find_child(teleport_name, true, false)
+		if node:
+			var pos = node.global_position
+			temp_scene.queue_free()
+			return pos
+
+	temp_scene.queue_free()
+	return Vector2.ZERO
