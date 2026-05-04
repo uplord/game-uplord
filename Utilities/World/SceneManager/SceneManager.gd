@@ -157,12 +157,18 @@ func teleport_player(target_stage: String, target_scene: String, target_teleport
 		"direction": exit_direction,
 	})
 
-func get_spawn_points_for_room() -> Array:
-	if selected_stage == null:
+func get_spawn_points_for_room(stage: String, scene: String) -> Array:
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [stage, scene]
+	var packed = load(path)
+
+	if packed == null:
 		return []
 
-	var spawn_parent = selected_stage.get_node_or_null("SpawnPoints")
+	var temp_scene = packed.instantiate()
+
+	var spawn_parent = temp_scene.get_node_or_null("SpawnPoints")
 	if spawn_parent == null:
+		temp_scene.queue_free()
 		return []
 
 	var points := []
@@ -171,6 +177,7 @@ func get_spawn_points_for_room() -> Array:
 		if spawn is Area2D:
 			points.append(spawn.global_position)
 
+	temp_scene.queue_free()
 	return points
 
 func resolve_teleport_position(stage: String, scene: String, teleport_name: String) -> Vector2:
