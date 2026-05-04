@@ -19,13 +19,14 @@ var connected: bool = false
 var handshake_sent: bool = false
 var heartbeat_timer: float = 0.0
 
+var spawn_points: Array = []
+var used_spawn_ids: Dictionary = {}
+
 
 # -------------------------
 # INIT
 # -------------------------
 func _ready() -> void:
-	print("READY")
-
 	is_server = "--server" in OS.get_cmdline_args()
 
 	if is_server:
@@ -177,16 +178,23 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			handle_disconnect(client_id, "requested leave")
 
 		"c_spawn_player":
-			print("c_spawn_player")
+			print("Spawn request: ", client_id)
 
-			var spawn_position = SceneManager.spawn_player_random_unused()
+			if used_spawn_ids.has(client_id):
+				used_spawn_ids.erase(client_id)
+
+			# 🔥 Ensure spawn points are loaded
+			if spawn_points.is_empty():
+				spawn_points = get_spawn_points_for_room()
+
+			var spawn_id = pick_spawn(client_id)
+			var spawn_position = spawn_points[spawn_id]
 
 			remote_players[client_id] = {
 				"position": spawn_position,
 				"direction": SceneManager.player.get_direction(),
 				"stage": SceneManager.current_stage,
 				"scene": SceneManager.current_scene,
-				"room": SceneManager.current_stage + ":" + SceneManager.current_scene
 			}
 
 			send_to_client(client_id, {
@@ -194,27 +202,17 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"spawn_position": spawn_position,
 			})
 
-			for id in connected_clients.keys():
-				send_to_client(id, {
-					"type": "s_remote_players",
-					"remote_players": _get_players_in_same_instance(id)
-				})
+			# for id in connected_clients.keys():
+			# 	send_to_client(id, {
+			# 		"type": "s_remote_players",
+			# 		"remote_players": _get_players_in_same_instance(id)
+			# 	})
 
 
 		"c_move_player":
-			remote_players[client_id] = {
-				"position": data.position,
-				"direction": data.direction,
-				"stage": data.stage,
-				"scene": data.scene,
-				"room": data.stage + ":" + data.scene
-			}
-
-			for id in connected_clients.keys():
-				send_to_client(id, {
-					"type": "s_remote_move",
-					"remote_players": _get_players_in_same_instance(id),
-				})
+			if used_spawn_ids.has(client_id):
+				used_spawn_ids.erase(client_id)
+			# print("c_move_player")
 
 
 func check_heartbeats():
@@ -226,23 +224,18 @@ func check_heartbeats():
 
 
 func handle_disconnect(client_id: int, reason: String) -> void:
-	if connected_clients.has(client_id):
-		connected_clients.erase(client_id)
+	print("Disconnect:", client_id, reason)
 
-	print("Client removed: ", client_id, " | Reason: ", reason)
-	
-	if remote_players.has(client_id):
-		remote_players.erase(client_id)
+	# 🔥 FREE SPAWN
+	if used_spawn_ids.has(client_id):
+		used_spawn_ids.erase(client_id)
 
-	broadcast({
-		"type": "s_remote_players",
-		"remote_players": remote_players,
-	})
+	remote_players.erase(client_id)
+	connected_clients.erase(client_id)
 
-	broadcast({
+	send_to_client(client_id, {
 		"type": "s_remove",
-		"id": client_id,
-		"reason": reason
+		"id": client_id
 	})
 
 func handle_server_disconnect():
@@ -262,27 +255,45 @@ func handle_server_disconnect():
 		peer.close()
 		peer = null
 
-func _get_players_in_same_instance(client_id: int) -> Dictionary:
-	var result := {}
+func get_spawn_points_for_room():
+	var scene = SceneManager.selected_stage
+	if scene == null:
+		return []
 
-	if not remote_players.has(client_id):
-		return result
+	var spawn_parent = scene.get_node_or_null("SpawnPoints")
+	if spawn_parent == null:
+		return []
 
-	var client_data = remote_players[client_id]
+	var points := []
 
-	if not client_data.has("stage") or not client_data.has("scene"):
-		return result
+	for spawn in spawn_parent.get_children():
+		if spawn is Area2D:
+			points.append(spawn.global_position)
 
-	for id in remote_players.keys():
-		var data = remote_players[id]
+	return points
 
-		if not data.has("stage") or not data.has("scene"):
-			continue
 
-		if data.stage == client_data.stage and data.scene == client_data.scene:
-			result[id] = data
+func pick_spawn(client_id: int) -> int:
+	var available := []
 
-	return result
+	for i in range(spawn_points.size()):
+		if not used_spawn_ids.values().has(i):
+			available.append(i)
+
+	var chosen: int
+
+	print("available: ", available)
+
+	if available.is_empty():
+		chosen = randi() % spawn_points.size()
+	else:
+		chosen = available.pick_random()
+
+	print("chosen: ", chosen)
+
+	used_spawn_ids[client_id] = chosen
+	return chosen
+
 
 # -------------------------
 # CLIENT
@@ -312,14 +323,15 @@ func handle_client_packet(data: Dictionary):
 
 		"s_handshake_ack":
 			connected = true
+			local_peer_id = data.client_id
 			print("Handshake confirmed!")
-			if data.has("client_id"):
-				local_peer_id = data.client_id
-			emit_signal("server_ready")
+			server_ready.emit()
 
 		"s_remote_players":
+			print("s_remote_players")
 			SceneManager._load_remote_players(data.remote_players)
 
 		"s_remote_move":
-			SceneManager._move_remote_players(data.remote_players)
+			print("s_remote_move")
+			#SceneManager._move_remote_players(data.remote_players)
 			

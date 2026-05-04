@@ -63,8 +63,8 @@ func stop_movement():
 	velocity = Vector2.ZERO
 	has_target = false
 
-func get_direction():
-	return body.scale.x
+func get_direction() -> int:
+	return 1 if body.scale.x >= 0 else -1
 
 # -------------------------
 # RESPawn FIXED

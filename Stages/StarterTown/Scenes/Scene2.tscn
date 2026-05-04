@@ -25,4 +25,5 @@ teleport_direction = 7
 position = Vector2(1306, 429)
 target_stage = "TestTown"
 target_scene = "Scene1"
+target_teleport = ""
 teleport_direction = 4

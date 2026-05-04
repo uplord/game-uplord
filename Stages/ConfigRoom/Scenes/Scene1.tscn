@@ -22,20 +22,19 @@ target_stage = "StarterTown"
 target_scene = "Scene1"
 teleport_direction = 0
 
-[node name="Button" type="Button" parent="." unique_id=317524561]
+[node name="Control" type="Control" parent="." unique_id=274667101]
+z_index = 900
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Button" type="Button" parent="Control" unique_id=317524561]
 custom_minimum_size = Vector2(120, 48)
-offset_left = 1180.0
-offset_top = 199.0
-offset_right = 1300.0
-offset_bottom = 247.0
+layout_mode = 0
+offset_left = 1462.0
+offset_top = 15.0
+offset_right = 1582.0
+offset_bottom = 63.0
 text = "Teleport"
 script = ExtResource("4_evsb7")
 target_stage = "StarterTown"
 target_scene = "Scene1"
-
-[node name="Label" type="Label" parent="." unique_id=13850564]
-offset_left = 278.0
-offset_top = 87.0
-offset_right = 318.0
-offset_bottom = 110.0
-text = "Config Room"

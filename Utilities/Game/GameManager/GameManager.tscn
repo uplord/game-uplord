@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dfsxma8jlju08"]
 
 [ext_resource type="Script" uid="uid://os303jgqn6yv" path="res://Utilities/Game/GameManager/GameManager.gd" id="1_j3pce"]
+[ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="2_7puba"]
 
 [node name="GameManager" type="Node" unique_id=893299197]
 script = ExtResource("1_j3pce")
@@ -8,16 +9,75 @@ script = ExtResource("1_j3pce")
 [node name="SceneContainer" type="Node" parent="." unique_id=723358073]
 
 [node name="UI" type="Control" parent="." unique_id=2016092514]
+z_index = 1000
 layout_mode = 3
 anchors_preset = 0
 
-[node name="Repawn" type="Button" parent="UI" unique_id=1407557553]
-custom_minimum_size = Vector2(160, 48)
+[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=494931796]
+custom_minimum_size = Vector2(16, 16)
 layout_mode = 0
-offset_left = 762.0
-offset_top = 46.0
-offset_right = 922.0
-offset_bottom = 94.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 156.0
+offset_bottom = 256.0
+theme_override_constants/separation = 16
+
+[node name="Repawn" type="Button" parent="UI/VBoxContainer" unique_id=1407557553]
+custom_minimum_size = Vector2(160, 48)
+layout_mode = 2
 text = "Respawn"
 
-[connection signal="pressed" from="UI/Repawn" to="." method="_on_repawn_pressed"]
+[node name="Teleport" type="Button" parent="UI/VBoxContainer" unique_id=471807604]
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+text = "Starter Town 1"
+script = ExtResource("2_7puba")
+target_stage = "StarterTown"
+target_scene = "Scene1"
+target_teleport = ""
+
+[node name="Teleport2" type="Button" parent="UI/VBoxContainer" unique_id=1149059204]
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+text = "Starter Town 2
+"
+script = ExtResource("2_7puba")
+target_stage = "StarterTown"
+target_scene = "Scene2"
+
+[node name="Teleport3" type="Button" parent="UI/VBoxContainer" unique_id=872013952]
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+text = "Config Room
+"
+script = ExtResource("2_7puba")
+target_stage = "ConfigRoom"
+target_scene = "Scene1"
+
+[node name="Teleport4" type="Button" parent="UI/VBoxContainer" unique_id=1804305439]
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+text = "Test Town"
+script = ExtResource("2_7puba")
+target_stage = "TestTown"
+target_scene = "Scene1"
+target_teleport = ""
+
+[node name="Labels" type="VBoxContainer" parent="UI" unique_id=1514305788]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 16.0
+offset_right = 293.0
+offset_bottom = 78.0
+theme_override_constants/separation = 16
+
+[node name="LabelStage" type="Label" parent="UI/Labels" unique_id=1392778946]
+layout_mode = 2
+
+[node name="LabelScene" type="Label" parent="UI/Labels" unique_id=2071185784]
+layout_mode = 2
+
+[node name="LabelStageCount" type="Label" parent="UI/Labels" unique_id=582605065]
+layout_mode = 2
+
+[connection signal="pressed" from="UI/VBoxContainer/Repawn" to="." method="_on_repawn_pressed"]
