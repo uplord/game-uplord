@@ -12,5 +12,6 @@ scale = Vector2(0.25, 0.25)
 [node name="Body" type="Node2D" parent="Model" unique_id=1281244017]
 
 [node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=1413598600]
+modulate = Color(0.101960786, 1, 1, 1)
 texture = ExtResource("2_lkt0a")
 offset = Vector2(0, -677)

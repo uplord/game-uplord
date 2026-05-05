@@ -20,19 +20,10 @@ var heartbeat_timer: float = 0.0
 
 # 🔥 NOW SCOPED PER INSTANCE
 var used_spawn_ids: Dictionary = {}
-# format:
-# {
-#   "stage::scene": { client_id: spawn_index }
-# }
-
 const MAX_PLAYERS_PER_INSTANCE := 3
 var instance_population := {}
-# {
-#   "stage::instance": [client_ids]
-# }
 
 var spawn_points_cache: Dictionary = {}
-
 var spawn_radius := 64
 
 
@@ -301,6 +292,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"stage": stage,
 				"scene": scene,
 				"instance": instance,
+				"instance_count": instance_population[key].size()
 			}
 
 			send_to_client(client_id, {
@@ -310,36 +302,47 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			})
 
+			_broadcast_remote_snapshot()
+
+
 
 		"c_move_player":
-			if not remote_players.has(client_id):
-				return
+			var stage = data.stage
+			var scene = data.scene
+			var instance = data.instance
 
-			var data_ref = remote_players[client_id]
-			var stage = data_ref.stage
-			var scene = data_ref.scene
-			var instance = data_ref.instance
-
+			# optional: keep spawn validation (your existing logic)
 			var key = _get_instance_key(stage, instance)
 
-			if not used_spawn_ids.has(key):
-				return
+			if used_spawn_ids.has(key) and used_spawn_ids[key].has(client_id):
+				var spawn_id = used_spawn_ids[key][client_id]
+				var spawn_pos = get_spawn_points(stage, scene)[spawn_id]
 
-			if not used_spawn_ids[key].has(client_id):
-				return
+				if data.position.distance_to(spawn_pos) > spawn_radius:
+					used_spawn_ids[key].erase(client_id)
 
-			var spawn_id = used_spawn_ids[key][client_id]
-			var spawn_pos = get_spawn_points(stage, scene)[spawn_id]
+			remote_players[client_id] = {
+				"position": data.position,
+				"direction": data.direction,
+				"stage": stage,
+				"scene": scene,
+				"instance": instance,
+				"instance_count": instance_population[key].size()
+			}
 
-			if data.position.distance_to(spawn_pos) > spawn_radius:
-				used_spawn_ids[key].erase(client_id)
+			# 🔥 broadcast movement immediately
+			send_to_client(client_id, {
+				"type": "s_move_player",
+				"client_id": client_id,
+				"position": data.position
+			})
+
+			_broadcast_remote_snapshot()
 
 
 		"c_teleport_player":
 			var target_stage = data.stage if data.stage != "" else SceneManager.current_stage
 			var target_scene = data.scene if data.scene != "" else SceneManager.current_scene
-
-			var is_stage_change = remote_players.has(client_id) and remote_players[client_id]["stage"] != target_stage
 
 			_free_spawn(client_id)
 			_remove_from_instance(client_id)
@@ -371,10 +374,11 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 			remote_players[client_id] = {
 				"position": position,
-				"direction": data.direction,
+				"direction": data.direction.x,
 				"stage": target_stage,
 				"scene": target_scene,
 				"instance": instance,
+				"instance_count": instance_population[key].size()
 			}
 
 			send_to_client(client_id, {
@@ -387,6 +391,14 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			})
 
+			_broadcast_remote_snapshot()
+
+
+func _broadcast_remote_snapshot() -> void:
+	broadcast({
+		"type": "s_remote_players",
+		"remote_players": remote_players
+	})
 
 # ==================================================
 # HEARTBEAT / DISCONNECT
@@ -403,6 +415,7 @@ func _full_cleanup_client(client_id: int):
 	_remove_from_instance(client_id)
 	remote_players.erase(client_id)
 	connected_clients.erase(client_id)
+	_broadcast_remote_snapshot()
 
 func handle_disconnect(client_id: int, reason: String) -> void:
 	print("Disconnect: ", client_id, " - ", reason)
@@ -448,8 +461,6 @@ func handle_client_packet(data: Dictionary):
 
 		"s_spawn_player":
 			SceneManager.current_instance = data.instance
-			SceneManager.instance_player_count = data.instance_count
-			GameManager.update_ui()
 			SceneManager.player.reset_teleport_state()
 			SceneManager.player.visible = true
 			SceneManager.player.respawn(data.spawn_position)
@@ -462,10 +473,12 @@ func handle_client_packet(data: Dictionary):
 			server_ready.emit()
 
 		"s_remote_players":
-			SceneManager._load_remote_players(data.remote_players)
+			SceneManager.spawn_remote_players(data.remote_players)
+
+		"s_move_player":
+			SceneManager.move_remote_players(data)
 
 		"s_teleport_player":
-			SceneManager.instance_player_count = data.instance_count
 			GameManager.update_ui()
 
 			SceneManager.apply_teleport(

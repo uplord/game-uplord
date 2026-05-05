@@ -17,7 +17,11 @@ var player: Node2D
 var spawn_requested := false
 var scene_transitioning := false
 
+var last_remote_snapshot: Dictionary = {}
+
 var instance_player_count: int = 0
+
+# { peer_id: Node2D }
 
 func setup(scene_container: Node):
 	container = scene_container
@@ -61,12 +65,6 @@ func load_stage(spawn_position := Vector2.INF):
 	selected_stage = packed_scene.instantiate()
 	container.add_child(selected_stage)
 
-	# CLEAR REMOTE_PLAYERS
-	var remote_parent = selected_stage.get_node_or_null("RemotePlayers")
-	if remote_parent:
-		for child in remote_parent.get_children():
-			child.queue_free()
-
 	# PLAYER
 	if player == null:
 		player = player_scene.instantiate()
@@ -95,11 +93,16 @@ func load_stage(spawn_position := Vector2.INF):
 		spawn_requested = true
 		ServerManager.send_to_server({ "type": "c_spawn_player" })
 
+	var remote_parent = Node2D.new()
+	remote_parent.name = "RemotePlayers"
+	selected_stage.add_child(remote_parent)
+
 	# FREE TRANSITION LOCK
 	get_tree().create_timer(0.2).timeout.connect(func():
 		scene_transitioning = false
 	)
 
+	# print('load_stage UI')
 	GameManager.update_ui()
 
 func respawn_player():
@@ -113,8 +116,10 @@ func respawn_player():
 	)
 
 	if same_location:
+		print(111)
 		ServerManager.send_to_server({ "type": "c_spawn_player" })
 	else:
+		print(3333)
 		spawn_requested = false
 		current_stage = default_stage
 		current_scene = default_scene
@@ -141,6 +146,7 @@ func apply_teleport(stage: String, scene: String, position: Vector2, exit_direct
 	player.set_facing(exit_direction)
 	player.unlock_teleport()
 
+	# print('apply_teleport UI')
 	GameManager.update_ui()
 
 func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT):
@@ -206,3 +212,70 @@ func resolve_teleport_position(stage: String, scene: String, teleport_name: Stri
 
 	temp_scene.queue_free()
 	return Vector2.ZERO
+
+
+func move_remote_players(data: Dictionary):
+	print("move_remote_players")
+
+
+func spawn_remote_players(data: Dictionary):
+	last_remote_snapshot = data
+	var parent = selected_stage.get_node_or_null("RemotePlayers")
+	if parent == null:
+		return
+
+	# 🔥 HARD RESET (CRITICAL FIX)
+	for child in parent.get_children():
+		child.queue_free()
+
+	var my_id = ServerManager.get_local_peer_id()
+
+	for client_id in data.keys():
+
+		if client_id == my_id:
+			continue
+
+		var p = data[client_id]
+
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+
+		if not p.has("stage") or not p.has("scene") or not p.has("instance") or not p.has("position"):
+			continue
+
+		if p.stage != current_stage:
+			continue
+		if p.scene != current_scene:
+			continue
+		if p.instance != current_instance:
+			continue
+
+		var remote_player = remote_player_scene.instantiate()
+		remote_player.name = "RemotePlayer_%d" % client_id
+		remote_player.global_position = p.position
+		parent.add_child(remote_player)
+
+	GameManager.update_ui()
+
+func get_local_instance_count() -> int:
+	return _count_from_snapshot(last_remote_snapshot)
+
+
+func _count_from_snapshot(snapshot: Dictionary) -> int:
+	var count := 0
+
+	for client_id in snapshot.keys():
+
+		var p = snapshot[client_id]
+
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+
+		if not p.has("stage") or not p.has("instance"):
+			continue
+
+		if p.stage == current_stage \
+		and p.instance == current_instance:
+			count += 1
+
+	return count

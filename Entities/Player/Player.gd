@@ -85,6 +85,7 @@ func respawn(spawn_position: Vector2):
 		"direction": body.scale.x,
 		"stage": SceneManager.current_stage,
 		"scene": SceneManager.current_scene,
+		"instance": SceneManager.current_instance,
 	})
 
 # -------------------------
