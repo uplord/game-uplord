@@ -17,6 +17,8 @@ var player: Node2D
 var spawn_requested := false
 var scene_transitioning := false
 
+var instance_player_count: int = 0
+
 func setup(scene_container: Node):
 	container = scene_container
 
@@ -98,6 +100,8 @@ func load_stage(spawn_position := Vector2.INF):
 		scene_transitioning = false
 	)
 
+	GameManager.update_ui()
+
 func respawn_player():
 	if not ServerManager.is_ready():
 		print("Cannot respawn: server not ready")
@@ -136,6 +140,8 @@ func apply_teleport(stage: String, scene: String, position: Vector2, exit_direct
 
 	player.set_facing(exit_direction)
 	player.unlock_teleport()
+
+	GameManager.update_ui()
 
 func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT):
 	if scene_transitioning:

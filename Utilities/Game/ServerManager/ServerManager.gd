@@ -25,7 +25,7 @@ var used_spawn_ids: Dictionary = {}
 #   "stage::scene": { client_id: spawn_index }
 # }
 
-const MAX_PLAYERS_PER_INSTANCE := 2
+const MAX_PLAYERS_PER_INSTANCE := 3
 var instance_population := {}
 # {
 #   "stage::instance": [client_ids]
@@ -211,6 +211,14 @@ func _free_spawn(client_id: int):
 func is_new_stage(client_id: int, stage: String) -> bool:
 	return not remote_players.has(client_id) or remote_players[client_id]["stage"] != stage
 
+func get_instance_player_count(stage: String, instance: int) -> int:
+	var key = _get_instance_key(stage, instance)
+
+	if not instance_population.has(key):
+		return 0
+
+	return instance_population[key].size()
+
 # ==================================================
 # SPAWN SYSTEM
 # ==================================================
@@ -299,6 +307,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"type": "s_spawn_player",
 				"spawn_position": spawn_position,
 				"instance": instance,
+				"instance_count": instance_population[key].size()
 			})
 
 
@@ -375,6 +384,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"stage": target_stage,
 				"scene": target_scene,
 				"instance": instance,
+				"instance_count": instance_population[key].size()
 			})
 
 
@@ -438,6 +448,8 @@ func handle_client_packet(data: Dictionary):
 
 		"s_spawn_player":
 			SceneManager.current_instance = data.instance
+			SceneManager.instance_player_count = data.instance_count
+			GameManager.update_ui()
 			SceneManager.player.reset_teleport_state()
 			SceneManager.player.visible = true
 			SceneManager.player.respawn(data.spawn_position)
@@ -453,6 +465,9 @@ func handle_client_packet(data: Dictionary):
 			SceneManager._load_remote_players(data.remote_players)
 
 		"s_teleport_player":
+			SceneManager.instance_player_count = data.instance_count
+			GameManager.update_ui()
+
 			SceneManager.apply_teleport(
 				data.stage,
 				data.scene,
