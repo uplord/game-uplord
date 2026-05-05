@@ -213,6 +213,7 @@ func resolve_teleport_position(stage: String, scene: String, teleport_name: Stri
 
 func spawn_remote_players(data: Dictionary):
 	last_remote_snapshot = data
+
 	var parent = selected_stage.get_node_or_null("RemotePlayers")
 	if parent == null:
 		return

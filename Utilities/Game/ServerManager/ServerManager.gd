@@ -20,7 +20,6 @@ var heartbeat_timer: float = 0.0
 
 # 🔥 NOW SCOPED PER INSTANCE
 var used_spawn_ids: Dictionary = {}
-const MAX_PLAYERS_PER_INSTANCE := 3
 var instance_population := {}
 
 var spawn_points_cache: Dictionary = {}
@@ -156,8 +155,25 @@ func start_server(port: int = 9000) -> void:
 func _get_instance_key(stage: String, instance: int) -> String:
 	return "%s::%d" % [stage, instance]
 
-func find_available_instance(stage: String) -> int:
+func get_instance_limit(stage: String, scene: String) -> int:
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [stage, scene]
+	var packed = load(path)
+
+	if packed == null:
+		return 2
+
+	var temp = packed.instantiate()
+
+	var limit := 2
+	if "player_max" in temp:
+		limit = temp.player_max
+
+	temp.queue_free()
+	return limit
+
+func find_available_instance(stage: String, scene: String) -> int:
 	var instance := 1
+	var limit := get_instance_limit(stage, scene)
 
 	while true:
 		var key = _get_instance_key(stage, instance)
@@ -166,7 +182,7 @@ func find_available_instance(stage: String) -> int:
 			instance_population[key] = []
 			return instance
 
-		if instance_population[key].size() < MAX_PLAYERS_PER_INSTANCE:
+		if instance_population[key].size() < limit:
 			return instance
 
 		instance += 1
@@ -274,7 +290,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			var scene = SceneManager.current_scene
 
 			# ALWAYS assign instance based on STAGE ONLY
-			var instance = find_available_instance(stage)
+			var instance = find_available_instance(stage, scene)
 			var key = _get_instance_key(stage, instance)
 
 			if not instance_population.has(key):
@@ -344,7 +360,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			var instance: int
 
 			if is_new_stage(client_id, target_stage):
-				instance = find_available_instance(target_stage)
+				instance = find_available_instance(target_stage, target_scene)
 			else:
 				instance = remote_players[client_id]["instance"]
 

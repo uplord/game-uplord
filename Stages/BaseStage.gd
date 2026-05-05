@@ -6,8 +6,7 @@ var player: Player
 @export var player_speed := 600
 @export var player_scale := 1.0
 @export var allow_player_movement := true
-@export var player_max := 2
-@export var hide_remote_players := false
+@export var player_max := 3
 
 
 func set_player(p: Player) -> void:
