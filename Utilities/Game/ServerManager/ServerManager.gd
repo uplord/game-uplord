@@ -282,7 +282,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 			instance_population[key].append(client_id)
 
-			print("STAGE: ", stage, "-", instance, " : SCENE: ", scene)
+			# print("STAGE: ", stage, "-", instance, " : SCENE: ", scene)
 
 			var spawn_position = get_spawn_position(client_id, stage, scene, instance)
 
@@ -330,13 +330,6 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			}
 
-			# 🔥 broadcast movement immediately
-			send_to_client(client_id, {
-				"type": "s_move_player",
-				"client_id": client_id,
-				"position": data.position
-			})
-
 			_broadcast_remote_snapshot()
 
 
@@ -361,7 +354,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 			instance_population[key].append(client_id)
 
-			print("STAGE: ", target_stage, "-", instance, " : SCENE: ", target_scene)
+			# print("STAGE: ", target_stage, "-", instance, " : SCENE: ", target_scene)
 
 			var position = SceneManager.resolve_teleport_position(
 				target_stage,
@@ -474,9 +467,6 @@ func handle_client_packet(data: Dictionary):
 
 		"s_remote_players":
 			SceneManager.spawn_remote_players(data.remote_players)
-
-		"s_move_player":
-			SceneManager.move_remote_players(data)
 
 		"s_teleport_player":
 			GameManager.update_ui()

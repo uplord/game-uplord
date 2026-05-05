@@ -116,10 +116,8 @@ func respawn_player():
 	)
 
 	if same_location:
-		print(111)
 		ServerManager.send_to_server({ "type": "c_spawn_player" })
 	else:
-		print(3333)
 		spawn_requested = false
 		current_stage = default_stage
 		current_scene = default_scene
@@ -146,7 +144,6 @@ func apply_teleport(stage: String, scene: String, position: Vector2, exit_direct
 	player.set_facing(exit_direction)
 	player.unlock_teleport()
 
-	# print('apply_teleport UI')
 	GameManager.update_ui()
 
 func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT):
@@ -214,10 +211,6 @@ func resolve_teleport_position(stage: String, scene: String, teleport_name: Stri
 	return Vector2.ZERO
 
 
-func move_remote_players(data: Dictionary):
-	print("move_remote_players")
-
-
 func spawn_remote_players(data: Dictionary):
 	last_remote_snapshot = data
 	var parent = selected_stage.get_node_or_null("RemotePlayers")
@@ -253,6 +246,7 @@ func spawn_remote_players(data: Dictionary):
 		var remote_player = remote_player_scene.instantiate()
 		remote_player.name = "RemotePlayer_%d" % client_id
 		remote_player.global_position = p.position
+		remote_player.set_direction(p.direction)
 		parent.add_child(remote_player)
 
 	GameManager.update_ui()

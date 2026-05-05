@@ -45,14 +45,13 @@ func _physics_process(_delta):
 		velocity = dir * speed
 		move_and_slide()
 
-		# ✅ only flip when actually moving
-		if abs(velocity.x) > 5:
-			body.scale.x = 1 if velocity.x < 0 else -1
+		var facing = -1 if velocity.x < 0 else 1
+		body.scale.x = facing
 
 		ServerManager.send_to_server({
 			"type": "c_move_player",
 			"position": global_position,
-			"direction": body.scale.x,
+			"direction": facing,
 			"stage": SceneManager.current_stage,
 			"scene": SceneManager.current_scene,
 			"instance": SceneManager.current_instance,
@@ -111,7 +110,7 @@ func reset_teleport_state():
 
 func set_facing(direction: Vector2):
 	if abs(direction.x) > 0.1:
-		body.scale.x = 1 if direction.x < 0 else -1
+		body.scale.x = -1 if direction.x < 0 else 1
 
 
 func set_movement_enabled(enabled: bool):
