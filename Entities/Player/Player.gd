@@ -33,6 +33,9 @@ func _input(event):
 
 
 func _physics_process(_delta):
+	if not ServerManager.is_ready():
+		return
+
 	if not movement_enabled:
 		velocity = Vector2.ZERO
 		return
@@ -52,6 +55,7 @@ func _physics_process(_delta):
 			"direction": body.scale.x,
 			"stage": SceneManager.current_stage,
 			"scene": SceneManager.current_scene,
+			"instance": SceneManager.current_instance,
 		})
 	else:
 		velocity = Vector2.ZERO

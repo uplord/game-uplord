@@ -2,6 +2,7 @@ extends Node
 
 @export var current_stage: String = "StarterTown"
 @export var current_scene: String = "Scene1"
+@export var current_instance: int = 1
 
 @export var default_stage: String = "StarterTown"
 @export var default_scene: String = "Scene1"
@@ -116,18 +117,19 @@ func respawn_player():
 
 		load_stage(Vector2.INF)
 
-
-func apply_teleport(stage: String, scene: String, position: Vector2, exit_direction: Vector2):
+func apply_teleport(stage: String, scene: String, position: Vector2, exit_direction: Vector2, instance := 1):
 	if player == null:
 		return
 
-	var stage_changed := stage != current_stage or scene != current_scene
+	var stage_changed := stage != current_stage
+	var scene_changed := scene != current_scene
 
 	current_stage = stage
 	current_scene = scene
+	current_instance = instance
 
-	# MOVE + LOAD
-	if stage_changed:
+	# 🔥 IMPORTANT: reload if EITHER changes
+	if stage_changed or scene_changed:
 		load_stage(position)
 	else:
 		player.global_position = position

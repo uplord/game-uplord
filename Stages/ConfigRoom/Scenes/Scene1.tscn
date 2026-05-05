@@ -9,6 +9,7 @@
 script = ExtResource("1_wwv42")
 player_scale = 1.6
 allow_player_movement = false
+hide_remote_players = true
 
 [node name="Background" type="Sprite2D" parent="." unique_id=333577954]
 texture = ExtResource("2_epy44")

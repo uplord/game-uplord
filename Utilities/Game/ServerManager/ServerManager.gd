@@ -25,6 +25,12 @@ var used_spawn_ids: Dictionary = {}
 #   "stage::scene": { client_id: spawn_index }
 # }
 
+const MAX_PLAYERS_PER_INSTANCE := 2
+var instance_population := {}
+# {
+#   "stage::instance": [client_ids]
+# }
+
 var spawn_points_cache: Dictionary = {}
 
 var spawn_radius := 64
@@ -156,12 +162,37 @@ func start_server(port: int = 9000) -> void:
 # ==================================================
 # INSTANCE HELPERS
 # ==================================================
-func _get_instance_key(stage: String, scene: String) -> String:
-	return stage + "::" + scene
+func _get_instance_key(stage: String, instance: int) -> String:
+	return "%s::%d" % [stage, instance]
+
+func find_available_instance(stage: String) -> int:
+	var instance := 1
+
+	while true:
+		var key = _get_instance_key(stage, instance)
+
+		if not instance_population.has(key):
+			instance_population[key] = []
+			return instance
+
+		if instance_population[key].size() < MAX_PLAYERS_PER_INSTANCE:
+			return instance
+
+		instance += 1
+
+	return 1
+
+func _remove_from_instance(client_id: int):
+	for key in instance_population.keys():
+		if instance_population[key].has(client_id):
+			instance_population[key].erase(client_id)
+
+			if instance_population[key].is_empty():
+				instance_population.erase(key)
 
 
 func get_spawn_points(stage: String, scene: String) -> Array:
-	var key = _get_instance_key(stage, scene)
+	var key = "%s::%s" % [stage, scene] # cache should NOT use instance
 
 	if not spawn_points_cache.has(key):
 		spawn_points_cache[key] = SceneManager.get_spawn_points_for_room(stage, scene)
@@ -177,12 +208,14 @@ func _free_spawn(client_id: int):
 			if used_spawn_ids[key].is_empty():
 				used_spawn_ids.erase(key)
 
+func is_new_stage(client_id: int, stage: String) -> bool:
+	return not remote_players.has(client_id) or remote_players[client_id]["stage"] != stage
 
 # ==================================================
 # SPAWN SYSTEM
 # ==================================================
-func get_spawn_position(client_id: int, stage: String, scene: String) -> Vector2:
-	var key = _get_instance_key(stage, scene)
+func get_spawn_position(client_id: int, stage: String, scene: String, instance: int) -> Vector2:
+	var key = _get_instance_key(stage, instance)
 
 	if not used_spawn_ids.has(key):
 		used_spawn_ids[key] = {}
@@ -236,22 +269,36 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 		"c_spawn_player":
 			_free_spawn(client_id)
+			_remove_from_instance(client_id)
 
 			var stage = SceneManager.current_stage
 			var scene = SceneManager.current_scene
 
-			var spawn_position = get_spawn_position(client_id, stage, scene)
+			# ALWAYS assign instance based on STAGE ONLY
+			var instance = find_available_instance(stage)
+			var key = _get_instance_key(stage, instance)
+
+			if not instance_population.has(key):
+				instance_population[key] = []
+
+			instance_population[key].append(client_id)
+
+			print("STAGE: ", stage, "-", instance, " : SCENE: ", scene)
+
+			var spawn_position = get_spawn_position(client_id, stage, scene, instance)
 
 			remote_players[client_id] = {
 				"position": spawn_position,
 				"direction": SceneManager.player.get_direction(),
 				"stage": stage,
 				"scene": scene,
+				"instance": instance,
 			}
 
 			send_to_client(client_id, {
 				"type": "s_spawn_player",
 				"spawn_position": spawn_position,
+				"instance": instance,
 			})
 
 
@@ -262,8 +309,9 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			var data_ref = remote_players[client_id]
 			var stage = data_ref.stage
 			var scene = data_ref.scene
+			var instance = data_ref.instance
 
-			var key = _get_instance_key(stage, scene)
+			var key = _get_instance_key(stage, instance)
 
 			if not used_spawn_ids.has(key):
 				return
@@ -282,7 +330,26 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			var target_stage = data.stage if data.stage != "" else SceneManager.current_stage
 			var target_scene = data.scene if data.scene != "" else SceneManager.current_scene
 
+			var is_stage_change = remote_players.has(client_id) and remote_players[client_id]["stage"] != target_stage
+
 			_free_spawn(client_id)
+			_remove_from_instance(client_id)
+
+			# 🔥 NEW RULE: stage change = new instance
+			var instance: int
+
+			if is_new_stage(client_id, target_stage):
+				instance = find_available_instance(target_stage)
+			else:
+				instance = remote_players[client_id]["instance"]
+
+			var key = _get_instance_key(target_stage, instance)
+			if not instance_population.has(key):
+				instance_population[key] = []
+
+			instance_population[key].append(client_id)
+
+			print("STAGE: ", target_stage, "-", instance, " : SCENE: ", target_scene)
 
 			var position = SceneManager.resolve_teleport_position(
 				target_stage,
@@ -291,13 +358,14 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			)
 
 			if position == Vector2.ZERO:
-				position = get_spawn_position(client_id, target_stage, target_scene)
+				position = get_spawn_position(client_id, target_stage, target_scene, instance)
 
 			remote_players[client_id] = {
 				"position": position,
 				"direction": data.direction,
 				"stage": target_stage,
 				"scene": target_scene,
+				"instance": instance,
 			}
 
 			send_to_client(client_id, {
@@ -306,6 +374,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"direction": data.direction,
 				"stage": target_stage,
 				"scene": target_scene,
+				"instance": instance,
 			})
 
 
@@ -319,13 +388,16 @@ func check_heartbeats():
 		if connected_clients[client_id] > HEARTBEAT_TIMEOUT:
 			handle_disconnect(client_id, "timeout")
 
+func _full_cleanup_client(client_id: int):
+	_free_spawn(client_id)
+	_remove_from_instance(client_id)
+	remote_players.erase(client_id)
+	connected_clients.erase(client_id)
 
 func handle_disconnect(client_id: int, reason: String) -> void:
 	print("Disconnect: ", client_id, " - ", reason)
 
-	_free_spawn(client_id)
-	remote_players.erase(client_id)
-	connected_clients.erase(client_id)
+	_full_cleanup_client(client_id)
 
 
 func handle_server_disconnect():
@@ -365,6 +437,7 @@ func handle_client_packet(data: Dictionary):
 			print("Removed:", data.id)
 
 		"s_spawn_player":
+			SceneManager.current_instance = data.instance
 			SceneManager.player.reset_teleport_state()
 			SceneManager.player.visible = true
 			SceneManager.player.respawn(data.spawn_position)
@@ -384,5 +457,6 @@ func handle_client_packet(data: Dictionary):
 				data.stage,
 				data.scene,
 				data.position,
-				data.direction
+				data.direction,
+				data.instance
 			)

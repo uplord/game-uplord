@@ -4,13 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://coqsknhmn6mhb" path="res://Stages/TestTown/Art/scene-1.png" id="1_o1isr"]
 [ext_resource type="PackedScene" uid="uid://wpsjxeghnhop" path="res://Entities/Teleports/SpawnPoint/SpawnPoint.tscn" id="2_npn0u"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_jus1r"]
-
-[sub_resource type="GDScript" id="GDScript_o1isr"]
-script/source = "extends Button
-
-func _pressed():
-	SceneManager.respawn_player()
-"
+[ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="5_npn0u"]
 
 [node name="Scene1" type="Node2D" unique_id=321670176]
 script = ExtResource("1_npn0u")
@@ -40,11 +34,15 @@ position = Vector2(539, 768)
 [node name="SpawnPoint3" parent="SpawnPoints" unique_id=1757801471 instance=ExtResource("2_npn0u")]
 position = Vector2(1059, 772)
 
-[node name="Button2" type="Button" parent="." unique_id=396676937]
-custom_minimum_size = Vector2(160, 48)
-offset_left = 762.0
-offset_top = 46.0
-offset_right = 922.0
-offset_bottom = 94.0
-text = "Respawn"
-script = SubResource("GDScript_o1isr")
+[node name="Teleport4" type="Button" parent="." unique_id=680092631]
+z_index = 900
+custom_minimum_size = Vector2(120, 48)
+offset_left = 1014.0
+offset_top = 54.0
+offset_right = 1212.0
+offset_bottom = 102.0
+text = "Respawn Test Town"
+script = ExtResource("5_npn0u")
+target_stage = "TestTown"
+target_scene = "Scene1"
+target_teleport = ""
