@@ -44,6 +44,8 @@ text = "Starter Town 2
 script = ExtResource("2_7puba")
 target_stage = "StarterTown"
 target_scene = "Scene2"
+target_teleport = "Teleport2"
+exit_direction = 0
 
 [node name="Teleport3" type="Button" parent="UI/VBoxContainer" unique_id=872013952]
 custom_minimum_size = Vector2(120, 48)

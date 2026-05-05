@@ -101,6 +101,10 @@ func is_ready() -> bool:
 func _send(data: Dictionary, target: int) -> void:
 	if peer == null:
 		return
+
+	if peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+
 	peer.set_target_peer(target)
 	peer.put_var(data)
 	peer.set_target_peer(0)
@@ -317,17 +321,11 @@ func check_heartbeats():
 
 
 func handle_disconnect(client_id: int, reason: String) -> void:
-	print("Disconnect:", client_id, reason)
+	print("Disconnect: ", client_id, " - ", reason)
 
 	_free_spawn(client_id)
-
 	remote_players.erase(client_id)
 	connected_clients.erase(client_id)
-
-	send_to_client(client_id, {
-		"type": "s_remove",
-		"id": client_id
-	})
 
 
 func handle_server_disconnect():

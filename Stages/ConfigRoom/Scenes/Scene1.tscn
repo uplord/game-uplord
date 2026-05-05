@@ -20,7 +20,7 @@ centered = false
 position = Vector2(804, 809)
 target_stage = "StarterTown"
 target_scene = "Scene1"
-teleport_direction = 0
+teleport_direction = 2
 
 [node name="Control" type="Control" parent="." unique_id=274667101]
 z_index = 900

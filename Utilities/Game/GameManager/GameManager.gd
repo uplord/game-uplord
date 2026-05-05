@@ -30,5 +30,4 @@ func _on_server_lost():
 
 
 func _on_repawn_pressed() -> void:
-	print(55553)
 	SceneManager.respawn_player()
