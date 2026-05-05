@@ -35,7 +35,6 @@ func _on_server_lost():
 
 func _on_repawn_pressed() -> void:
 	SceneManager.respawn_player()
-	update_ui()
 
 func update_ui():
 	label_stage.text = "%s-%d" % [
