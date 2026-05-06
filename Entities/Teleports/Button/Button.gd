@@ -16,5 +16,6 @@ func _pressed():
 		target_stage,
 		target_scene,
 		target_teleport,
-		dir
+		dir,
+		true,
 	)

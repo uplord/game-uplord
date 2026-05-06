@@ -119,12 +119,14 @@ func send_to_client(client_id: int, data: Dictionary) -> void:
 func broadcast(data: Dictionary) -> void:
 	_send(data, 0)
 
+func broadcast_to_instance(stage: String, instance: int, data: Dictionary):
+	var key = "%s::%d" % [stage, instance]
 
-func broadcast_except(excluded_id: int, data: Dictionary) -> void:
-	for client_id in connected_clients.keys():
-		if client_id != excluded_id:
-			_send(data, client_id)
+	if not instance_population.has(key):
+		return
 
+	for client_id in instance_population[key]:
+		_send(data, client_id)
 
 func get_local_peer_id() -> int:
 	if local_peer_id != -1:
@@ -165,8 +167,6 @@ func get_instance_limit(stage: String) -> int:
 	var temp = packed.instantiate()
 
 	var limit := 3
-
-	print("temp: ", temp)
 
 	if "player_max" in temp:
 		limit = temp.player_max
@@ -221,13 +221,6 @@ func _free_spawn(client_id: int):
 func is_new_stage(client_id: int, stage: String) -> bool:
 	return not remote_players.has(client_id) or remote_players[client_id]["stage"] != stage
 
-func get_instance_player_count(stage: String, instance: int) -> int:
-	var key = _get_instance_key(stage, instance)
-
-	if not instance_population.has(key):
-		return 0
-
-	return instance_population[key].size()
 
 # ==================================================
 # SPAWN SYSTEM
@@ -321,9 +314,11 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			})
 
-			_broadcast_remote_snapshot()
-
-
+			broadcast_to_instance(stage, instance, {
+				"type": "s_remote_players",
+				"id": client_id,
+				"remote_players": remote_players
+			})
 
 		"c_move_player":
 			var stage = data.stage
@@ -349,7 +344,11 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			}
 
-			_broadcast_remote_snapshot()
+			broadcast_to_instance(stage, instance, {
+				"type": "s_remote_players",
+				"id": client_id,
+				"remote_players": remote_players
+			})
 
 
 		"c_teleport_player":
@@ -361,11 +360,14 @@ func handle_server_packet(client_id: int, data: Dictionary):
 
 			# 🔥 NEW RULE: stage change = new instance
 			var instance: int
+			var old_stage: String = remote_players[client_id]["stage"]
+			var old_instance: int = remote_players[client_id]["instance"]
 
 			if is_new_stage(client_id, target_stage):
 				instance = find_available_instance(target_stage)
 			else:
 				instance = remote_players[client_id]["instance"]
+
 
 			var key = _get_instance_key(target_stage, instance)
 			if not instance_population.has(key):
@@ -403,14 +405,22 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			})
 
-			_broadcast_remote_snapshot()
+			print("OLD: ", old_stage, " - ", old_instance)
+			print("NEW: ", target_stage, " - ", instance)
 
+			broadcast_to_instance(old_stage, old_instance, {
+				"type": "s_remote_players",
+				"id": client_id,
+				"remote_players": remote_players
+			})
 
-func _broadcast_remote_snapshot() -> void:
-	broadcast({
-		"type": "s_remote_players",
-		"remote_players": remote_players
-	})
+			broadcast_to_instance(target_stage, instance, {
+				"type": "s_remote_players",
+				"id": client_id,
+				"remote_players": remote_players
+			})
+			
+
 
 # ==================================================
 # HEARTBEAT / DISCONNECT
@@ -423,11 +433,25 @@ func check_heartbeats():
 			handle_disconnect(client_id, "timeout")
 
 func _full_cleanup_client(client_id: int):
+	var stage := ""
+	var instance := 1
+
+	if remote_players.has(client_id):
+		stage = remote_players[client_id].get("stage", "")
+		instance = remote_players[client_id].get("instance", 1)
+
 	_free_spawn(client_id)
 	_remove_from_instance(client_id)
 	remote_players.erase(client_id)
 	connected_clients.erase(client_id)
-	_broadcast_remote_snapshot()
+
+	if stage != "":
+		broadcast_to_instance(stage, instance, {
+			"type": "s_remote_players",
+			"id": client_id,
+			"remote_players": remote_players
+		})
+
 
 func handle_disconnect(client_id: int, reason: String) -> void:
 	print("Disconnect: ", client_id, " - ", reason)

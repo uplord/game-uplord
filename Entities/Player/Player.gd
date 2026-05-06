@@ -121,8 +121,9 @@ func set_movement_enabled(enabled: bool):
 		stop_movement()
 
 func _apply_z_sort():
-	z_index = int(global_position.y)
+	var base = int(global_position.y)
 
-	# local player ALWAYS wins ties
 	if is_local:
-		z_index += 1
+		base -= 1
+
+	z_index = base

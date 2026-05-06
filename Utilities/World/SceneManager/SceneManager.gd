@@ -168,7 +168,7 @@ func apply_teleport(stage: String, scene: String, position: Vector2, exit_direct
 
 	GameManager.update_ui()
 
-func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT):
+func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT, allow_respawn: bool = false):
 	if scene_transitioning:
 		return
 
@@ -176,6 +176,9 @@ func teleport_player(target_stage: String, target_scene: String, target_teleport
 		return
 
 	if player.spawn_protection or not player.can_teleport:
+		return
+
+	if (current_stage == target_stage && current_scene == target_scene && !allow_respawn):
 		return
 
 	player.lock_teleport()
