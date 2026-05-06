@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://ch4kwp7otarig"]
+
+[ext_resource type="Script" uid="uid://cmj7y8t5t10g" path="res://Stages/BaseStage.gd" id="1_tqve7"]
+
+[node name="ConfigRoom_tscn" type="Node2D" unique_id=118672122]
+script = ExtResource("1_tqve7")
+player_scale = 1.8
+allow_player_movement = false
+player_max = 1

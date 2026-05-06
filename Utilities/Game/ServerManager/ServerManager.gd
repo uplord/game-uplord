@@ -155,25 +155,28 @@ func start_server(port: int = 9000) -> void:
 func _get_instance_key(stage: String, instance: int) -> String:
 	return "%s::%d" % [stage, instance]
 
-func get_instance_limit(stage: String, scene: String) -> int:
-	var path = "res://Stages/%s/Scenes/%s.tscn" % [stage, scene]
+func get_instance_limit(stage: String) -> int:
+	var path = "res://Stages/%s/%s.tscn" % [stage, stage]
 	var packed = load(path)
 
 	if packed == null:
-		return 2
+		return 3
 
 	var temp = packed.instantiate()
 
-	var limit := 2
+	var limit := 3
+
+	print("temp: ", temp)
+
 	if "player_max" in temp:
 		limit = temp.player_max
 
 	temp.queue_free()
 	return limit
 
-func find_available_instance(stage: String, scene: String) -> int:
+func find_available_instance(stage: String) -> int:
 	var instance := 1
-	var limit := get_instance_limit(stage, scene)
+	var limit := get_instance_limit(stage)
 
 	while true:
 		var key = _get_instance_key(stage, instance)
@@ -290,7 +293,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			var scene = SceneManager.current_scene
 
 			# ALWAYS assign instance based on STAGE ONLY
-			var instance = find_available_instance(stage, scene)
+			var instance = find_available_instance(stage)
 			var key = _get_instance_key(stage, instance)
 
 			if not instance_population.has(key):
@@ -360,7 +363,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			var instance: int
 
 			if is_new_stage(client_id, target_stage):
-				instance = find_available_instance(target_stage, target_scene)
+				instance = find_available_instance(target_stage)
 			else:
 				instance = remote_players[client_id]["instance"]
 

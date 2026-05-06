@@ -14,6 +14,8 @@ var movement_enabled := true
 
 var spawn_protection := false
 
+var is_local := true
+
 
 func _ready():
 	set_facing(Vector2(1, 0))
@@ -59,7 +61,7 @@ func _physics_process(_delta):
 	else:
 		velocity = Vector2.ZERO
 
-	z_index = int(global_position.y)
+	_apply_z_sort()
 
 
 func stop_movement():
@@ -117,3 +119,10 @@ func set_movement_enabled(enabled: bool):
 	movement_enabled = enabled
 	if not enabled:
 		stop_movement()
+
+func _apply_z_sort():
+	z_index = int(global_position.y)
+
+	# local player ALWAYS wins ties
+	if is_local:
+		z_index += 1

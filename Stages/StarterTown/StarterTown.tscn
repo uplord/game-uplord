@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c571fpuo5bu01"]
+
+[ext_resource type="Script" uid="uid://cmj7y8t5t10g" path="res://Stages/BaseStage.gd" id="1_auhtf"]
+
+[node name="StarterTown" type="Node2D" unique_id=1253186418]
+script = ExtResource("1_auhtf")

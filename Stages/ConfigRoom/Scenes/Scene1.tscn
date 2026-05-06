@@ -1,15 +1,10 @@
 [gd_scene format=3 uid="uid://bw6q0fuwjtlp8"]
 
-[ext_resource type="Script" uid="uid://cmj7y8t5t10g" path="res://Stages/BaseStage.gd" id="1_wwv42"]
 [ext_resource type="Texture2D" uid="uid://c1udcjfveplsm" path="res://Stages/ConfigRoom/Art/scene-1.png" id="2_epy44"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_xaq3x"]
 [ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="4_evsb7"]
 
 [node name="Scene1" type="Node2D" unique_id=321670176]
-script = ExtResource("1_wwv42")
-player_scale = 1.6
-allow_player_movement = false
-hide_remote_players = true
 
 [node name="Background" type="Sprite2D" parent="." unique_id=333577954]
 texture = ExtResource("2_epy44")

@@ -55,11 +55,11 @@ func load_stage(spawn_position := Vector2.INF):
 		selected_stage.queue_free()
 		selected_stage = null
 
-	var path = "res://Stages/%s/Scenes/%s.tscn" % [current_stage, current_scene]
+	var stage_path = "res://Stages/%s/%s.tscn" % [current_stage, current_stage]
+	var packed_scene = load(stage_path)
 
-	var packed_scene = load(path)
 	if packed_scene == null:
-		print("Failed to load scene: ", path)
+		print("Failed to load stage: ", stage_path)
 		return null
 
 	selected_stage = packed_scene.instantiate()
@@ -93,6 +93,8 @@ func load_stage(spawn_position := Vector2.INF):
 		spawn_requested = true
 		ServerManager.send_to_server({ "type": "c_spawn_player" })
 
+	_load_scene(current_scene)
+
 	var remote_parent = Node2D.new()
 	remote_parent.name = "RemotePlayers"
 	selected_stage.add_child(remote_parent)
@@ -104,6 +106,26 @@ func load_stage(spawn_position := Vector2.INF):
 
 	# print('load_stage UI')
 	GameManager.update_ui()
+
+func _load_scene(scene_name: String):
+	if selected_stage == null:
+		return
+
+	# remove old scenes
+	for child in selected_stage.get_children():
+		if child.name.begins_with("Scene"):
+			child.queue_free()
+
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [current_stage, scene_name]
+	var packed = load(path)
+
+	if packed == null:
+		print("Failed to load scene: ", path)
+		return
+
+	var scene = packed.instantiate()
+	scene.name = scene_name
+	selected_stage.add_child(scene)
 
 func respawn_player():
 	if not ServerManager.is_ready():
