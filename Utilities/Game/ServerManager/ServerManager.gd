@@ -119,13 +119,28 @@ func send_to_client(client_id: int, data: Dictionary) -> void:
 func broadcast(data: Dictionary) -> void:
 	_send(data, 0)
 
-func broadcast_to_instance(stage: String, instance: int, data: Dictionary):
+func broadcast_to_instance(stage: String, scene: String, instance: int, data: Dictionary):
 	var key = "%s::%d" % [stage, instance]
 
 	if not instance_population.has(key):
 		return
 
 	for client_id in instance_population[key]:
+		if not remote_players.has(client_id):
+			continue
+
+		var p = remote_players[client_id]
+
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+
+		if p.get("stage") != stage:
+			continue
+		if p.get("scene") != scene:
+			continue
+		if p.get("instance") != instance:
+			continue
+
 		_send(data, client_id)
 
 func get_local_peer_id() -> int:
@@ -221,6 +236,26 @@ func _free_spawn(client_id: int):
 func is_new_stage(client_id: int, stage: String) -> bool:
 	return not remote_players.has(client_id) or remote_players[client_id]["stage"] != stage
 
+func get_instance_remote_players(stage: String, scene: String, instance: int) -> Dictionary:
+	var result := {}
+
+	for client_id in remote_players.keys():
+		var p = remote_players[client_id]
+
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+
+		if p.get("stage") != stage:
+			continue
+		if p.get("scene") != scene:
+			continue
+		if p.get("instance") != instance:
+			continue
+
+		result[client_id] = p
+
+	return result
+
 
 # ==================================================
 # SPAWN SYSTEM
@@ -314,10 +349,10 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			})
 
-			broadcast_to_instance(stage, instance, {
+			broadcast_to_instance(stage, scene, instance, {
 				"type": "s_remote_players",
 				"id": client_id,
-				"remote_players": remote_players
+				"remote_players": get_instance_remote_players(stage, scene, instance)
 			})
 
 		"c_move_player":
@@ -344,10 +379,10 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			}
 
-			broadcast_to_instance(stage, instance, {
+			broadcast_to_instance(stage, scene, instance, {
 				"type": "s_remote_players",
 				"id": client_id,
-				"remote_players": remote_players
+				"remote_players": get_instance_remote_players(stage, scene, instance)
 			})
 
 
@@ -361,6 +396,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			# 🔥 NEW RULE: stage change = new instance
 			var instance: int
 			var old_stage: String = remote_players[client_id]["stage"]
+			var old_scene: String = remote_players[client_id]["scene"]
 			var old_instance: int = remote_players[client_id]["instance"]
 
 			if is_new_stage(client_id, target_stage):
@@ -405,19 +441,19 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance_count": instance_population[key].size()
 			})
 
-			print("OLD: ", old_stage, " - ", old_instance)
-			print("NEW: ", target_stage, " - ", instance)
+			print("OLD: ", old_stage, " - ", old_instance, " - " , old_scene)
+			print("NEW: ", target_stage, " - ", instance, " - ", target_scene)
 
-			broadcast_to_instance(old_stage, old_instance, {
+			broadcast_to_instance(old_stage, old_scene, old_instance, {
 				"type": "s_remote_players",
 				"id": client_id,
-				"remote_players": remote_players
+				"remote_players": get_instance_remote_players(old_stage, old_scene, old_instance)
 			})
 
-			broadcast_to_instance(target_stage, instance, {
+			broadcast_to_instance(target_stage, target_scene, instance, {
 				"type": "s_remote_players",
 				"id": client_id,
-				"remote_players": remote_players
+				"remote_players": get_instance_remote_players(target_stage, target_scene, instance)
 			})
 			
 
@@ -434,10 +470,12 @@ func check_heartbeats():
 
 func _full_cleanup_client(client_id: int):
 	var stage := ""
+	var scene := ""
 	var instance := 1
 
 	if remote_players.has(client_id):
 		stage = remote_players[client_id].get("stage", "")
+		scene = remote_players[client_id].get("scene", "")
 		instance = remote_players[client_id].get("instance", 1)
 
 	_free_spawn(client_id)
@@ -446,10 +484,10 @@ func _full_cleanup_client(client_id: int):
 	connected_clients.erase(client_id)
 
 	if stage != "":
-		broadcast_to_instance(stage, instance, {
+		broadcast_to_instance(stage, scene, instance, {
 			"type": "s_remote_players",
 			"id": client_id,
-			"remote_players": remote_players
+			"remote_players": get_instance_remote_players(stage, scene, instance)
 		})
 
 

@@ -20,7 +20,4 @@ func set_direction(dir: int):
 func _apply_z_sort():
 	var base = int(global_position.y)
 
-	if is_local:
-		base -= 1
-
 	z_index = base
