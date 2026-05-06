@@ -143,6 +143,7 @@ func broadcast_to_instance(stage: String, scene: String, instance: int, data: Di
 
 		_send(data, client_id)
 
+
 func get_local_peer_id() -> int:
 	if local_peer_id != -1:
 		return local_peer_id
@@ -385,7 +386,6 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"remote_players": get_instance_remote_players(stage, scene, instance)
 			})
 
-
 		"c_teleport_player":
 			var target_stage = data.stage if data.stage != "" else SceneManager.current_stage
 			var target_scene = data.scene if data.scene != "" else SceneManager.current_scene
@@ -440,9 +440,6 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"instance": instance,
 				"instance_count": instance_population[key].size()
 			})
-
-			print("OLD: ", old_stage, " - ", old_instance, " - " , old_scene)
-			print("NEW: ", target_stage, " - ", instance, " - ", target_scene)
 
 			broadcast_to_instance(old_stage, old_scene, old_instance, {
 				"type": "s_remote_players",
@@ -541,6 +538,8 @@ func handle_client_packet(data: Dictionary):
 			SceneManager.player.stop_movement()
 			SceneManager.player.set_facing(Vector2(1, 0))
 
+			GameManager.update_ui()
+
 		"s_handshake_ack":
 			connected = true
 			local_peer_id = data.client_id
@@ -550,7 +549,6 @@ func handle_client_packet(data: Dictionary):
 			SceneManager.spawn_remote_players(data.remote_players)
 
 		"s_teleport_player":
-			GameManager.update_ui()
 
 			SceneManager.apply_teleport(
 				data.stage,
@@ -559,3 +557,5 @@ func handle_client_packet(data: Dictionary):
 				data.direction,
 				data.instance
 			)
+
+			GameManager.update_ui()

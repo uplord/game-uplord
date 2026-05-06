@@ -43,4 +43,5 @@ func update_ui():
 	]
 
 	label_scene.text = SceneManager.current_scene
-	label_count.text = "Players: %d" % SceneManager.get_local_instance_count()
+
+	label_count.text = "COUNT COMING SOON"
