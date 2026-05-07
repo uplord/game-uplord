@@ -268,5 +268,6 @@ func spawn_remote_players(data: Dictionary):
 		remote_player.global_position = p.position
 		remote_player.set_direction(p.direction)
 		parent.add_child(remote_player)
+		selected_stage.set_remote_player(remote_player)
 
 	GameManager.update_ui()

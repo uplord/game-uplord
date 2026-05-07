@@ -1,7 +1,16 @@
 [gd_scene format=3 uid="uid://dln8i38i54imj"]
 
 [ext_resource type="Script" uid="uid://bxdwfpc3382bh" path="res://Entities/Player/Player.gd" id="1_e5kic"]
+[ext_resource type="Shader" uid="uid://cci8kskhfmsfy" path="res://Entities/Player/Body.gdshader" id="2_vweq0"]
 [ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_ww0jn"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1des2"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vweq0"]
+shader = ExtResource("2_vweq0")
+shader_parameter/outline_width = 2.0000000298024
+shader_parameter/scale_factor = 1.0
+shader_parameter/outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ww0jn"]
 size = Vector2(180, 40)
@@ -13,10 +22,14 @@ script = ExtResource("1_e5kic")
 scale = Vector2(0.25, 0.25)
 
 [node name="Body" type="Node2D" parent="Model" unique_id=1281244017]
+material = SubResource("ShaderMaterial_1des2")
 
-[node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=1413598600]
+[node name="CanvasGroup" type="CanvasGroup" parent="Model/Body" unique_id=467880241]
+material = SubResource("ShaderMaterial_vweq0")
+
+[node name="Armour" type="Sprite2D" parent="Model/Body/CanvasGroup" unique_id=1413598600]
 texture = ExtResource("2_ww0jn")
-offset = Vector2(0, -677)
+offset = Vector2(0, -697)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=894241408]
 position = Vector2(0, -20)

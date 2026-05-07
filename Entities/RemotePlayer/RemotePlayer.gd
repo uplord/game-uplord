@@ -1,7 +1,7 @@
-extends Node2D
+extends CharacterBody2D
 class_name RemotePlayer
 
-@onready var body = $Model/Body
+@onready var body = $Model/Body/CanvasGroup
 
 var is_local := false
 
