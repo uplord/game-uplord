@@ -17,6 +17,9 @@ var player: Node2D
 var spawn_requested := false
 var scene_transitioning := false
 
+var last_remote_snapshot: Dictionary = {}
+var instance_player_count: int = 0
+
 # { peer_id: Node2D }
 
 func setup(scene_container: Node):
@@ -232,6 +235,7 @@ func resolve_teleport_position(stage: String, scene: String, teleport_name: Stri
 
 
 func spawn_remote_players(data: Dictionary):
+	last_remote_snapshot = data
 
 	var parent = selected_stage.get_node_or_null("RemotePlayers")
 	if parent == null:
@@ -271,3 +275,27 @@ func spawn_remote_players(data: Dictionary):
 		selected_stage.set_remote_player(remote_player)
 
 	GameManager.update_ui()
+
+
+func get_local_instance_count() -> int:
+	return _count_from_snapshot(last_remote_snapshot)
+
+
+func _count_from_snapshot(snapshot: Dictionary) -> int:
+	var count := 0
+
+	for client_id in snapshot.keys():
+
+		var p = snapshot[client_id]
+
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+
+		if not p.has("stage") or not p.has("instance"):
+			continue
+
+		if p.stage == current_stage \
+		and p.instance == current_instance:
+			count += 1
+
+	return count
