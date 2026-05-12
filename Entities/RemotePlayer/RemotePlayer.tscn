@@ -1,14 +1,9 @@
 [gd_scene format=3 uid="uid://dcvpvvfno2yyb"]
 
 [ext_resource type="Script" uid="uid://cee2qvkd2ut01" path="res://Entities/RemotePlayer/RemotePlayer.gd" id="1_xx3ee"]
-[ext_resource type="Shader" uid="uid://cci8kskhfmsfy" path="res://Entities/Player/Body.gdshader" id="2_27307"]
 [ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_lkt0a"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_27307"]
-shader = ExtResource("2_27307")
-shader_parameter/outline_width = 2.0
-shader_parameter/scale_factor = 1.0
-shader_parameter/outline_color = Color(0, 0, 0, 1)
 
 [node name="RemotePlayer" type="CharacterBody2D" unique_id=951509883]
 script = ExtResource("1_xx3ee")

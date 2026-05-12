@@ -24,10 +24,10 @@ func _on_player_ready() -> void:
 	player.scale = Vector2(player_scale, player_scale)
 	player.set_movement_enabled(allow_player_movement)
 
-	var canvas_group := player.get_node_or_null("CanvasGroup")
-	if canvas_group and canvas_group.material is ShaderMaterial:
-		var mat := canvas_group.material as ShaderMaterial
-		mat.set_shader_parameter("scale_factor", player_scale)
+	#var canvas_group := player.get_node_or_null("CanvasGroup")
+	#if canvas_group and canvas_group.material is ShaderMaterial:
+		#var mat := canvas_group.material as ShaderMaterial
+		#mat.set_shader_parameter("scale_factor", player_scale)
 
 func set_remote_player(p: RemotePlayer) -> void:
 	remote_player = p
@@ -40,7 +40,7 @@ func _on_remote_player_ready() -> void:
 
 	remote_player.scale = Vector2(player_scale, player_scale)
 	
-	var canvas_group := remote_player.get_node_or_null("CanvasGroup")
-	if canvas_group and canvas_group.material is ShaderMaterial:
-		var mat := canvas_group.material as ShaderMaterial
-		mat.set_shader_parameter("scale_factor", player_scale)
+	#var canvas_group := remote_player.get_node_or_null("CanvasGroup")
+	#if canvas_group and canvas_group.material is ShaderMaterial:
+		#var mat := canvas_group.material as ShaderMaterial
+		#mat.set_shader_parameter("scale_factor", player_scale)
