@@ -17,9 +17,7 @@ scale = Vector2(0.25, 0.25)
 [node name="Body" type="Node2D" parent="Model" unique_id=1281244017]
 material = SubResource("ShaderMaterial_1des2")
 
-[node name="CanvasGroup" type="CanvasGroup" parent="Model/Body" unique_id=467880241]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/CanvasGroup" unique_id=1413598600]
+[node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=1413598600]
 texture = ExtResource("2_ww0jn")
 offset = Vector2(0, -697)
 

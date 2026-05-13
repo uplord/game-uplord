@@ -12,6 +12,8 @@ var selected_stage: Node
 
 var player_scene = preload("res://Entities/Player/Player.tscn")
 var remote_player_scene = preload("res://Entities/RemotePlayer/RemotePlayer.tscn")
+var enemy_scene = preload("res://Entities/Enemy/Enemy.tscn")
+var npc_scene = preload("res://Entities/Npc/Npc.tscn")
 
 var player: Node2D
 var spawn_requested := false
@@ -275,6 +277,54 @@ func spawn_remote_players(data: Dictionary):
 		selected_stage.set_remote_player(remote_player)
 
 	GameManager.update_ui()
+
+func spawn_enemies():
+	if selected_stage == null:
+		return
+
+	var scene_root = selected_stage.get_node_or_null(current_scene)
+
+	if scene_root == null:
+		print("SceneManager.spawn_enemies: no current scene loaded")
+		return
+
+	var enemy_points = scene_root.get_node_or_null("EnemyPoints")
+
+	if enemy_points == null:
+		print("SceneManager.spawn_enemies: EnemyPoints not found in scene", current_scene)
+		return
+
+	for point in enemy_points.get_children():
+		if point is Area2D:
+			var enemy = enemy_scene.instantiate()
+			enemy.name = "Enemy_%s" % point.name
+			enemy.global_position = point.global_position
+			enemy_points.add_child(enemy)
+			selected_stage.set_enemy(enemy)
+
+func spawn_npcs():
+	if selected_stage == null:
+		return
+
+	var scene_root = selected_stage.get_node_or_null(current_scene)
+
+	if scene_root == null:
+		print("SceneManager.spawn_npcs: no current scene loaded")
+		return
+
+	var npc_points = scene_root.get_node_or_null("NpcPoints")
+
+	if npc_points == null:
+		print("SceneManager.spawn_npcs: NpcPoints not found in scene", current_scene)
+		return
+
+	for point in npc_points.get_children():
+		if point is Area2D:
+			var npc = npc_scene.instantiate()
+			npc.name = "Npc_%s" % point.name
+			npc.global_position = point.global_position
+			npc_points.add_child(npc)
+			selected_stage.set_npc(npc)
 
 
 func get_local_instance_count() -> int:

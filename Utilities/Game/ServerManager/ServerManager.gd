@@ -3,10 +3,18 @@ extends Node
 signal server_ready
 signal server_lost
 
-var PacketManager = preload("PacketManager.gd")
+var PacketManagerScript = preload("PacketManager.gd")
+var InstanceManagerScript = preload("InstanceManager.gd")
+var DebugLoggerScript = preload("res://Utilities/Logger.gd")
 
+# Server configuration constants
 const HEARTBEAT_INTERVAL = 1.0
 const HEARTBEAT_TIMEOUT = 3.0
+const SPAWN_RADIUS = 64
+const MAX_INSTANCES_PER_STAGE = 10
+const INSTANCE_PLAYER_LIMIT = 3
+const DEFAULT_PORT = 9000
+const DEFAULT_SERVER_IP = "127.0.0.1"
 
 var peer: ENetMultiplayerPeer
 var is_server: bool = false
@@ -28,17 +36,30 @@ var spawn_points_cache: Dictionary = {}
 var spawn_radius := 64
 
 var packet_manager: Node
+var logger: Node
+var instance_manager: Node
+
+# Reconnect tracking
+var reconnect_attempts: Dictionary = {}
+var max_reconnect_attempts: int = 3
+var reconnect_delay: float = 2.0
 
 
 # -------------------------
 # INIT
 # -------------------------
 func _ready() -> void:
+	# Initialize logger
+	logger = DebugLoggerScript.new()
+	add_child(logger)
+	
 	is_server = "--server" in OS.get_cmdline_args()
 
 	if is_server:
+		logger.info("Starting server...")
 		start_server()
 	else:
+		logger.info("Starting client...")
 		start_client()
 
 	hb_timer = Timer.new()
@@ -48,8 +69,15 @@ func _ready() -> void:
 	hb_timer.timeout.connect(check_heartbeats)
 	add_child(hb_timer)
 
-	packet_manager = PacketManager.new()
+	# Initialize instance manager
+	instance_manager = InstanceManagerScript.new()
+	instance_manager.setup(self, logger)
+	add_child(instance_manager)
+
+	# Initialize packet manager
+	packet_manager = PacketManagerScript.new()
 	packet_manager.server_manager = self
+	packet_manager.logger = logger
 	add_child(packet_manager)
 
 
@@ -133,20 +161,10 @@ func broadcast_to_instance(stage: String, instance: int, data: Dictionary):
 	if not instance_population.has(key):
 		return
 
-	for client_id in instance_population[key]:
-		if not remote_players.has(client_id):
-			continue
-
-		var p = remote_players[client_id]
-
-		if typeof(p) != TYPE_DICTIONARY:
-			continue
-
-		if p.get("stage") != stage:
-			continue
-		if p.get("instance") != instance:
-			continue
-
+	# Get filtered list once instead of per-client checks
+	var recipients = get_instance_remote_players(stage, instance)
+	
+	for client_id in recipients.keys():
 		_send(data, client_id)
 
 
@@ -161,15 +179,18 @@ func get_local_peer_id() -> int:
 # -------------------------
 # SERVER
 # -------------------------
-func start_server(port: int = 9000) -> void:
+func start_server(port: int = -1) -> void:
+	if port == -1:
+		port = DEFAULT_PORT
+	
 	peer = ENetMultiplayerPeer.new()
 
 	var err := peer.create_server(port)
 	if err:
-		print("Server failed:", error_string(err))
+		logger.error("Server failed: %s" % error_string(err))
 		return
 
-	print("Server started:", port)
+	logger.info("Server started on port %d" % port)
 	is_server = true
 
 
@@ -293,10 +314,6 @@ func get_spawn_position(client_id: int, stage: String, scene: String, instance: 
 	return points[chosen]
 
 
-
-			
-
-
 # ==================================================
 # HEARTBEAT / DISCONNECT
 # ==================================================
@@ -309,12 +326,12 @@ func check_heartbeats():
 
 func _full_cleanup_client(client_id: int):
 	var stage := ""
-	var scene := ""
+	var _scene := ""
 	var instance := 1
 
 	if remote_players.has(client_id):
 		stage = remote_players[client_id].get("stage", "")
-		scene = remote_players[client_id].get("scene", "")
+		_scene = remote_players[client_id].get("scene", "")
 		instance = remote_players[client_id].get("instance", 1)
 
 	_free_spawn(client_id)
@@ -331,7 +348,7 @@ func _full_cleanup_client(client_id: int):
 
 
 func handle_disconnect(client_id: int, reason: String) -> void:
-	print("Disconnect: ", client_id, " - ", reason)
+	logger.info("Disconnect: %d - %s" % [client_id, reason])
 
 	_full_cleanup_client(client_id)
 
@@ -344,7 +361,7 @@ func handle_server_disconnect():
 	handshake_sent = false
 	heartbeat_timer = 0.0
 
-	print("Lost connection to server")
+	logger.warn("Lost connection to server")
 	server_lost.emit()
 
 	if peer:
@@ -355,12 +372,33 @@ func handle_server_disconnect():
 # -------------------------
 # CLIENT
 # -------------------------
-func start_client(ip_address: String = "127.0.0.1", port: int = 9000) -> void:
+func start_client(ip_address: String = "", port: int = -1) -> void:
+	if ip_address == "":
+		ip_address = DEFAULT_SERVER_IP
+	if port == -1:
+		port = DEFAULT_PORT
+	
 	peer = ENetMultiplayerPeer.new()
 
 	var err := peer.create_client(ip_address, port)
 	if err:
-		print("Client failed:", error_string(err))
+		logger.error("Client failed: %s" % error_string(err))
 		return
 
-	print("Connecting...")
+	logger.info("Connecting to %s:%d..." % [ip_address, port])
+
+
+# -------------------------
+# CLEANUP
+# -------------------------
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		if is_server and logger:
+			logger.info("Server shutting down, disconnecting all clients...")
+			for client_id in connected_clients.keys():
+				handle_disconnect(client_id, "server shutdown")
+		
+		if peer:
+			peer.close()
+			if logger:
+				logger.info("Peer connection closed")

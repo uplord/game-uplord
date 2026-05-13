@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://duaj2f1py1qfo" path="res://Stages/StarterTown/Art/scene-1.png" id="1_olaji"]
 [ext_resource type="PackedScene" uid="uid://wpsjxeghnhop" path="res://Entities/Teleports/SpawnPoint/SpawnPoint.tscn" id="2_3lljf"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_bg2oo"]
+[ext_resource type="PackedScene" uid="uid://c33s1ts2nd67y" path="res://Entities/Teleports/EnemyPoint/EnemyPoint.tscn" id="4_3lljf"]
+[ext_resource type="PackedScene" uid="uid://f1hrl6krk8vx" path="res://Entities/Teleports/NpcPoint/NpcPoint.tscn" id="5_bg2oo"]
 
 [node name="Scene1" type="Node2D" unique_id=321670176]
 
@@ -34,3 +36,15 @@ position = Vector2(1406, 388)
 target_stage = "StarterTown"
 target_scene = "Scene2"
 teleport_direction = 6
+
+[node name="EnemyPoints" type="Node2D" parent="." unique_id=284504029]
+
+[node name="EnemyPoint" parent="EnemyPoints" unique_id=1508234491 instance=ExtResource("4_3lljf")]
+position = Vector2(1407, 811)
+enemy_name = "Ellie"
+
+[node name="NpcPoints" type="Node2D" parent="." unique_id=1301425038]
+
+[node name="NpcPoint" parent="NpcPoints" unique_id=331254436 instance=ExtResource("5_bg2oo")]
+position = Vector2(210, 788)
+npc_name = "Jodie"

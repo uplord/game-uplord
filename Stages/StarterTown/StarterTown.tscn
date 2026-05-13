@@ -4,3 +4,4 @@
 
 [node name="StarterTown" type="Node2D" unique_id=1253186418]
 script = ExtResource("1_auhtf")
+player_scale = 0.8

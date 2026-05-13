@@ -3,9 +3,7 @@
 [ext_resource type="Script" uid="uid://cee2qvkd2ut01" path="res://Entities/RemotePlayer/RemotePlayer.gd" id="1_xx3ee"]
 [ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_lkt0a"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_27307"]
-
-[node name="RemotePlayer" type="CharacterBody2D" unique_id=951509883]
+[node name="RemotePlayer" type="Node2D" unique_id=245043162]
 script = ExtResource("1_xx3ee")
 
 [node name="Model" type="Node2D" parent="." unique_id=1385571394]
@@ -13,10 +11,7 @@ scale = Vector2(0.25, 0.25)
 
 [node name="Body" type="Node2D" parent="Model" unique_id=1281244017]
 
-[node name="CanvasGroup" type="CanvasGroup" parent="Model/Body" unique_id=1070551677]
-material = SubResource("ShaderMaterial_27307")
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/CanvasGroup" unique_id=1413598600]
+[node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=1413598600]
 modulate = Color(0.101960786, 1, 1, 1)
 texture = ExtResource("2_lkt0a")
 offset = Vector2(0, -697)

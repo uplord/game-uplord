@@ -1,9 +1,63 @@
 extends Node
 
 var server_manager: Node
+var logger: Node
 
 func _ready() -> void:
 	pass
+
+
+# ==================================================
+# VALIDATION
+# ==================================================
+func _is_valid_client(client_id: int) -> bool:
+	if not server_manager.remote_players.has(client_id):
+		logger.warn("Invalid client_id: %d" % client_id)
+		return false
+	return true
+
+
+func _is_position_valid(pos: Vector2) -> bool:
+	# Check position is within reasonable bounds (anti-cheat)
+	var max_coord = 10000.0
+	if abs(pos.x) > max_coord or abs(pos.y) > max_coord:
+		logger.warn("Position out of bounds: %v" % pos)
+		return false
+	return true
+
+
+func _validate_move_data(client_id: int, data: Dictionary) -> bool:
+	if not _is_valid_client(client_id):
+		return false
+	
+	if not data.has("position") or not data.has("direction"):
+		logger.warn("c_move_player missing required fields from client %d" % client_id)
+		return false
+	
+	if not _is_position_valid(data.position):
+		return false
+	
+	# Check speed (distance from last known position)
+	var last_pos = server_manager.remote_players[client_id].get("position", Vector2.ZERO)
+	var distance = last_pos.distance_to(data.position)
+	var max_distance = 1000.0  # Max pixels per frame
+	
+	if distance > max_distance:
+		logger.warn("Client %d moved too fast: %.1f pixels" % [client_id, distance])
+		return false
+	
+	return true
+
+
+func _validate_teleport_data(client_id: int, data: Dictionary) -> bool:
+	if not _is_valid_client(client_id):
+		return false
+	
+	if not data.has("direction"):
+		logger.warn("c_teleport_player missing direction from client %d" % client_id)
+		return false
+	
+	return true
 
 
 # ==================================================
@@ -72,8 +126,22 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"id": client_id,
 				"remote_players": server_manager.get_instance_remote_players(stage, instance)
 			})
+			
+			server_manager.broadcast_to_instance(stage, instance, {
+				"type": "s_enemies",
+				"id": client_id,
+			})
+			
+			server_manager.broadcast_to_instance(stage, instance, {
+				"type": "s_npcs",
+				"id": client_id,
+			})
 
 		"c_move_player":
+			if not _validate_move_data(client_id, data):
+				server_manager.handle_disconnect(client_id, "invalid move data")
+				return
+			
 			var stage = data.stage
 			var scene = data.scene
 			var instance = data.instance
@@ -104,6 +172,10 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			})
 
 		"c_teleport_player":
+			if not _validate_teleport_data(client_id, data):
+				server_manager.handle_disconnect(client_id, "invalid teleport data")
+				return
+			
 			var target_stage = data.stage if data.stage != "" else SceneManager.current_stage
 			var target_scene = data.scene if data.scene != "" else SceneManager.current_scene
 
@@ -113,7 +185,7 @@ func handle_server_packet(client_id: int, data: Dictionary):
 			# 🔥 NEW RULE: stage change = new instance
 			var instance: int
 			var old_stage: String = server_manager.remote_players[client_id]["stage"]
-			var old_scene: String = server_manager.remote_players[client_id]["scene"]
+			var _old_scene: String = server_manager.remote_players[client_id]["scene"]
 			var old_instance: int = server_manager.remote_players[client_id]["instance"]
 
 			if server_manager.is_new_stage(client_id, target_stage):
@@ -169,6 +241,16 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"id": client_id,
 				"remote_players": server_manager.get_instance_remote_players(target_stage, instance)
 			})
+			
+			server_manager.broadcast_to_instance(target_stage, instance, {
+				"type": "s_enemies",
+				"id": client_id,
+			})
+			
+			server_manager.broadcast_to_instance(target_stage, instance, {
+				"type": "s_npcs",
+				"id": client_id,
+			})
 
 
 # ==================================================
@@ -197,6 +279,12 @@ func handle_client_packet(data: Dictionary):
 
 		"s_remote_players":
 			SceneManager.spawn_remote_players(data.remote_players)
+			
+		"s_enemies":
+			SceneManager.spawn_enemies()
+
+		"s_npcs":
+			SceneManager.spawn_npcs()
 
 		"s_teleport_player":
 
