@@ -183,6 +183,9 @@ func teleport_player(target_stage: String, target_scene: String, target_teleport
 
 	player.lock_teleport()
 	player.stop_movement()
+	player.play_anim("idle")
+	
+	await get_tree().process_frame
 
 	# send request to server ONLY
 	ServerManager.send_to_server({
