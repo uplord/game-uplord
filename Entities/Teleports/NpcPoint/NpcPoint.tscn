@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://f1hrl6krk8vx"]
 
-[ext_resource type="Script" uid="uid://dvid8kq7k6svo" path="res://Entities/Teleports/NpcPoint/NpcPoint.gd" id="1_fo03t"]
-[ext_resource type="Texture2D" uid="uid://dxwnjocv4qrkj" path="res://Entities/Teleports/NpcPoint/Art/enemy.png" id="2_yqqll"]
+[ext_resource type="Script" uid="uid://2vu4rb3qybts" path="res://Entities/Teleports/NpcPoint/NpcPoint.gd" id="1_fo03t"]
+[ext_resource type="Texture2D" uid="uid://dlutyayh2vkui" path="res://Entities/Teleports/NpcPoint/Art/enemy.png" id="2_yqqll"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qo5rm"]
 size = Vector2(240, 60)
@@ -9,9 +9,8 @@ size = Vector2(240, 60)
 [node name="NpcPoint" type="Area2D" unique_id=1508234491]
 script = ExtResource("1_fo03t")
 
-[node name="Point" type="Sprite2D" parent="." unique_id=1124943527]
-modulate = Color(0.16164589, 0.35691214, 0.06559441, 1)
-texture = ExtResource("2_yqqll")
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=57776248]
 shape = SubResource("RectangleShape2D_qo5rm")
+
+[node name="Enemy" type="Sprite2D" parent="." unique_id=1003759581]
+texture = ExtResource("2_yqqll")

@@ -299,6 +299,7 @@ func spawn_enemies():
 			var enemy = enemy_scene.instantiate()
 			enemy.name = "Enemy_%s" % point.name
 			enemy.global_position = point.global_position
+			enemy.set_direction(point.direction)
 			enemy_points.add_child(enemy)
 			selected_stage.set_enemy(enemy)
 
@@ -321,8 +322,10 @@ func spawn_npcs():
 	for point in npc_points.get_children():
 		if point is Area2D:
 			var npc = npc_scene.instantiate()
+			print("point: ", point)
 			npc.name = "Npc_%s" % point.name
 			npc.global_position = point.global_position
+			npc.set_direction(point.direction)
 			npc_points.add_child(npc)
 			selected_stage.set_npc(npc)
 

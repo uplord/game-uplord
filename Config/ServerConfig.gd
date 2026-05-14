@@ -1,6 +1,6 @@
 extends Node
 
-class_name ServerConfig
+class_name ServerConfigClass
 
 const HEARTBEAT_INTERVAL = 1.0
 const HEARTBEAT_TIMEOUT = 3.0

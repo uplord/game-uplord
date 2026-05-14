@@ -3,7 +3,7 @@ class_name Player
 
 @export var speed := 400
 
-@onready var body = $Model/Body
+@onready var body = $Base/Humanoid
 
 var target: Vector2
 var has_target := false

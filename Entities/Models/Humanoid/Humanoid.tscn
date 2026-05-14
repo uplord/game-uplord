@@ -1,0 +1,218 @@
+[gd_scene format=3 uid="uid://btqmkf6wsl383"]
+
+[ext_resource type="Texture2D" uid="uid://beeeghwoog08o" path="res://Entities/Models/Humanoid/Art/Male/back_hand/armour.png" id="1_3j5xw"]
+[ext_resource type="Texture2D" uid="uid://br81qqax1hcto" path="res://Entities/Models/Humanoid/Art/Male/back_shoulder/armour.png" id="2_dtb42"]
+[ext_resource type="Texture2D" uid="uid://bmb3bp0u7tusw" path="res://Entities/Models/Humanoid/Art/Male/back_thigh/armour.png" id="3_aemfn"]
+[ext_resource type="Texture2D" uid="uid://chutmudm017dv" path="res://Entities/Models/Humanoid/Art/Male/back_shin/armour.png" id="4_hnspk"]
+[ext_resource type="Texture2D" uid="uid://c76f5ckrfbk3c" path="res://Entities/Models/Humanoid/Art/Male/back_foot/armour.png" id="5_3vyth"]
+[ext_resource type="Texture2D" uid="uid://ddx4d254tpvu5" path="res://Entities/Models/Humanoid/Art/Male/chest/armour.png" id="6_knlen"]
+[ext_resource type="Texture2D" uid="uid://c8no2kkcdknc8" path="res://Entities/Models/Humanoid/Art/Male/head/armour.png" id="7_lf42i"]
+[ext_resource type="Texture2D" uid="uid://b3twjapoj2ir2" path="res://Entities/Models/Humanoid/Art/Male/front_thigh/armour.png" id="8_32cg1"]
+[ext_resource type="Texture2D" uid="uid://da2smk5kmbrq8" path="res://Entities/Models/Humanoid/Art/Male/front_shin/armour.png" id="9_ymjlh"]
+[ext_resource type="Texture2D" uid="uid://bnpuc0ao60vl0" path="res://Entities/Models/Humanoid/Art/Male/front_foot/armour.png" id="10_o1lnn"]
+[ext_resource type="Texture2D" uid="uid://cxrufpg7pltja" path="res://Entities/Models/Humanoid/Art/Male/front_shoulder/armour.png" id="11_n4ik8"]
+[ext_resource type="Texture2D" uid="uid://bsdtrjb2f23gh" path="res://Entities/Models/Humanoid/Art/Male/front_hand/armour.png" id="12_ftajy"]
+
+[node name="Humanoid" type="Node2D" unique_id=1064279868]
+
+[node name="Body" type="Node2D" parent="." unique_id=1037677127]
+scale = Vector2(0.25, 0.25)
+
+[node name="BackHand" type="Node2D" parent="Body" unique_id=1024107481]
+position = Vector2(200.75, -859.5)
+
+[node name="Skin" type="Sprite2D" parent="Body/BackHand" unique_id=824252053]
+position = Vector2(200.75, -859.5)
+texture = ExtResource("1_3j5xw")
+offset = Vector2(-146.5, 960)
+
+[node name="BackShoulder" type="Node2D" parent="Body" unique_id=528252962]
+position = Vector2(136.75, -1048.75)
+
+[node name="Skin" type="Sprite2D" parent="Body/BackShoulder" unique_id=653910981]
+position = Vector2(136.75, -1048.75)
+texture = ExtResource("2_dtb42")
+offset = Vector2(-107.5, 1140.5)
+
+[node name="BackThigh" type="Node2D" parent="Body" unique_id=837033051]
+position = Vector2(86.75, -678.5)
+
+[node name="Skin" type="Sprite2D" parent="Body/BackThigh" unique_id=785102209]
+position = Vector2(86.75, -678.5)
+texture = ExtResource("3_aemfn")
+offset = Vector2(-85.5, 803)
+
+[node name="BackSkin" type="Node2D" parent="Body" unique_id=1628886575]
+position = Vector2(114.75, -404)
+
+[node name="Skin" type="Sprite2D" parent="Body/BackSkin" unique_id=1003425807]
+position = Vector2(114.75, -404)
+texture = ExtResource("4_hnspk")
+offset = Vector2(-115.5, 557)
+
+[node name="BackFoot" type="Node2D" parent="Body" unique_id=1917527986]
+position = Vector2(111.75, -91)
+
+[node name="Skin" type="Sprite2D" parent="Body/BackFoot" unique_id=199732716]
+position = Vector2(111.75, -91)
+texture = ExtResource("5_3vyth")
+offset = Vector2(-43.5, 132)
+
+[node name="Chest" type="Node2D" parent="Body" unique_id=1361880595]
+position = Vector2(41.75, -787.75)
+
+[node name="Skin" type="Sprite2D" parent="Body/Chest" unique_id=510387017]
+position = Vector2(41.75, -787.75)
+texture = ExtResource("6_knlen")
+offset = Vector2(-83.5, 659.5)
+
+[node name="Head" type="Node2D" parent="Body" unique_id=442595073]
+position = Vector2(27.75, -1181.5)
+
+[node name="Skin" type="Sprite2D" parent="Body/Head" unique_id=699134211]
+position = Vector2(27.75, -1181.5)
+texture = ExtResource("7_lf42i")
+offset = Vector2(-30.5, 1095)
+
+[node name="FrontThigh" type="Node2D" parent="Body" unique_id=1507431230]
+position = Vector2(-64.25, -670.5)
+
+[node name="Skin" type="Sprite2D" parent="Body/FrontThigh" unique_id=1922675362]
+position = Vector2(-64.25, -670.5)
+texture = ExtResource("8_32cg1")
+offset = Vector2(27.5, 796)
+
+[node name="FrontShin" type="Node2D" parent="Body" unique_id=142443223]
+position = Vector2(-161.25, -394.5)
+
+[node name="Skin" type="Sprite2D" parent="Body/FrontShin" unique_id=99184146]
+position = Vector2(-161.25, -394.5)
+texture = ExtResource("9_ymjlh")
+offset = Vector2(127.5, 551.5)
+
+[node name="FrontFoot" type="Node2D" parent="Body" unique_id=1336982610]
+position = Vector2(-238.5, -70.5)
+
+[node name="Skin" type="Sprite2D" parent="Body/FrontFoot" unique_id=1998873261]
+texture = ExtResource("10_o1lnn")
+offset = Vector2(-10.5, 41.75)
+
+[node name="FrontShoulder" type="Node2D" parent="Body" unique_id=1433457486]
+position = Vector2(-135.5, -1053.75)
+
+[node name="Skin" type="Sprite2D" parent="Body/FrontShoulder" unique_id=1430536804]
+position = Vector2(-135.5, -1053.75)
+texture = ExtResource("11_n4ik8")
+offset = Vector2(76.25, 1143.5)
+
+[node name="FrontHand" type="Node2D" parent="Body" unique_id=676752648]
+position = Vector2(-258.5, -869.75)
+
+[node name="Skin" type="Sprite2D" parent="Body/FrontHand" unique_id=1854005405]
+position = Vector2(-258.5, -869.75)
+texture = ExtResource("12_ftajy")
+offset = Vector2(233, 996.5)
+
+[node name="Bones" type="Node2D" parent="." unique_id=1445353338]
+scale = Vector2(0.25, 0.25)
+
+[node name="Skeleton2D" type="Skeleton2D" parent="Bones" unique_id=750841504]
+
+[node name="Hip" type="Bone2D" parent="Bones/Skeleton2D" unique_id=859160564]
+position = Vector2(41.75, -787.75)
+rest = Transform2D(1, 0, 0, 1, 41.75, -787.75)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip" unique_id=335349428]
+remote_path = NodePath("../../../../Body/Chest")
+
+[node name="BackShoulder" type="Bone2D" parent="Bones/Skeleton2D/Hip" unique_id=37437737]
+position = Vector2(95, -261)
+rest = Transform2D(1, 0, 0, 1, 95, -261)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/BackShoulder" unique_id=611412924]
+remote_path = NodePath("../../../../../Body/BackShoulder")
+
+[node name="BackHand" type="Bone2D" parent="Bones/Skeleton2D/Hip/BackShoulder" unique_id=1162278924]
+position = Vector2(64, 189.25)
+rest = Transform2D(1, 0, 0, 1, 64, 189.25)
+auto_calculate_length_and_angle = false
+length = 256.939
+bone_angle = 63.938
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/BackShoulder/BackHand" unique_id=1434335817]
+remote_path = NodePath("../../../../../../Body/BackHand")
+
+[node name="FrontShoulder" type="Bone2D" parent="Bones/Skeleton2D/Hip" unique_id=966506358]
+position = Vector2(-177.25, -266)
+rest = Transform2D(1, 0, 0, 1, -177.25, -266)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/FrontShoulder" unique_id=756297446]
+remote_path = NodePath("../../../../../Body/FrontShoulder")
+
+[node name="FrontHand" type="Bone2D" parent="Bones/Skeleton2D/Hip/FrontShoulder" unique_id=693680663]
+position = Vector2(-123, 184)
+rest = Transform2D(1, 0, 0, 1, -123, 184)
+auto_calculate_length_and_angle = false
+length = 268.788
+bone_angle = 100.07798
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/FrontShoulder/FrontHand" unique_id=194805771]
+remote_path = NodePath("../../../../../../Body/FrontHand")
+
+[node name="BackThigh" type="Bone2D" parent="Bones/Skeleton2D/Hip" unique_id=976461474]
+position = Vector2(45, 109.25)
+rest = Transform2D(1, 0, 0, 1, 45, 109.25)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/BackThigh" unique_id=341264202]
+remote_path = NodePath("../../../../../Body/BackThigh")
+
+[node name="BackShin" type="Bone2D" parent="Bones/Skeleton2D/Hip/BackThigh" unique_id=1553369176]
+position = Vector2(28, 274.5)
+rest = Transform2D(1, 0, 0, 1, 28, 274.5)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/BackThigh/BackShin" unique_id=686874678]
+remote_path = NodePath("../../../../../../Body/BackSkin")
+
+[node name="BackFoot" type="Bone2D" parent="Bones/Skeleton2D/Hip/BackThigh/BackShin" unique_id=764037507]
+position = Vector2(-3, 313)
+rest = Transform2D(1, 0, 0, 1, -3, 313)
+auto_calculate_length_and_angle = false
+length = 166.273
+bone_angle = 38.91899
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/BackThigh/BackShin/BackFoot" unique_id=380430182]
+remote_path = NodePath("../../../../../../../Body/BackFoot")
+
+[node name="FrontThigh" type="Bone2D" parent="Bones/Skeleton2D/Hip" unique_id=912920218]
+position = Vector2(-106, 117.25)
+rest = Transform2D(1, 0, 0, 1, -106, 117.25)
+
+[node name="RemoteTransform2D2" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/FrontThigh" unique_id=1725410790]
+remote_path = NodePath("../../../../../Body/FrontThigh")
+
+[node name="FrontShin" type="Bone2D" parent="Bones/Skeleton2D/Hip/FrontThigh" unique_id=1934026415]
+position = Vector2(-97, 276)
+rest = Transform2D(1, 0, 0, 1, -97, 276)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/FrontThigh/FrontShin" unique_id=230403282]
+remote_path = NodePath("../../../../../../Body/FrontShin")
+
+[node name="FrontFoot" type="Bone2D" parent="Bones/Skeleton2D/Hip/FrontThigh/FrontShin" unique_id=637309469]
+position = Vector2(-77.25, 324)
+rest = Transform2D(1, 0, 0, 1, -77.25, 324)
+auto_calculate_length_and_angle = false
+length = 118.795
+bone_angle = 100.07699
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/FrontThigh/FrontShin/FrontFoot" unique_id=548486650]
+remote_path = NodePath("../../../../../../../Body/FrontFoot")
+
+[node name="Head" type="Bone2D" parent="Bones/Skeleton2D/Hip" unique_id=1845206760]
+position = Vector2(-14, -393.75)
+rest = Transform2D(1, 0, 0, 1, -14, -393.75)
+auto_calculate_length_and_angle = false
+length = 134.494
+bone_angle = 0.0
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/Head" unique_id=1527337818]
+remote_path = NodePath("../../../../../Body/Head")

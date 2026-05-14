@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bw6q0fuwjtlp8"]
 
 [ext_resource type="Texture2D" uid="uid://c1udcjfveplsm" path="res://Stages/ConfigRoom/Art/scene-1.png" id="2_epy44"]
+[ext_resource type="PackedScene" uid="uid://f1hrl6krk8vx" path="res://Entities/Teleports/NpcPoint/NpcPoint.tscn" id="3_evsb7"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_xaq3x"]
 [ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="4_evsb7"]
 
@@ -17,6 +18,13 @@ position = Vector2(804, 809)
 target_stage = "StarterTown"
 target_scene = "Scene1"
 teleport_direction = 2
+
+[node name="NpcPoints" type="Node2D" parent="." unique_id=864210805]
+
+[node name="NpcPoint" parent="NpcPoints" unique_id=1508234491 instance=ExtResource("3_evsb7")]
+position = Vector2(1351, 768)
+npc_name = "Jodie"
+direction = 0
 
 [node name="Control" type="Control" parent="." unique_id=274667101]
 z_index = 900

@@ -1,17 +1,11 @@
 [gd_scene format=3 uid="uid://0em7fgjn27c0"]
 
-[ext_resource type="Script" uid="uid://r4jh0gphvrwr" path="res://Entities/Npc/Npc.gd" id="1_8qgad"]
-[ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_nss0t"]
+[ext_resource type="Script" uid="uid://dfms4a4ccfn45" path="res://Entities/Npc/Npc.gd" id="1_8qgad"]
+[ext_resource type="PackedScene" uid="uid://btqmkf6wsl383" path="res://Entities/Models/Humanoid/Humanoid.tscn" id="2_hpa00"]
 
 [node name="Npc" type="Node2D" unique_id=1507646410]
 script = ExtResource("1_8qgad")
 
-[node name="Model" type="Node2D" parent="." unique_id=2045214755]
-scale = Vector2(0.25, 0.25)
+[node name="Base" type="Node2D" parent="." unique_id=1571189122]
 
-[node name="Body" type="Node2D" parent="Model" unique_id=567184420]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body" unique_id=231541071]
-modulate = Color(0.6933486, 0.2903113, 0.41107938, 1)
-texture = ExtResource("2_nss0t")
-offset = Vector2(0, -697)
+[node name="Humanoid" parent="Base" unique_id=1064279868 instance=ExtResource("2_hpa00")]

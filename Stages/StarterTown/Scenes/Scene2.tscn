@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://duaj2f1py1qfo" path="res://Stages/StarterTown/Art/scene-1.png" id="1_54d35"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_5mq8b"]
+[ext_resource type="PackedScene" uid="uid://f1hrl6krk8vx" path="res://Entities/Teleports/NpcPoint/NpcPoint.tscn" id="3_657mg"]
 
 [node name="Scene2" type="Node2D" unique_id=321670176]
 
@@ -25,3 +26,10 @@ target_stage = "TestTown"
 target_scene = "Scene1"
 target_teleport = ""
 teleport_direction = 4
+
+[node name="NpcPoints" type="Node2D" parent="." unique_id=1388693167]
+
+[node name="NpcPoint" parent="NpcPoints" unique_id=1508234491 instance=ExtResource("3_657mg")]
+position = Vector2(1054, 806)
+npc_name = "Jodie"
+direction = 0

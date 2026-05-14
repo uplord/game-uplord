@@ -42,6 +42,7 @@ teleport_direction = 6
 [node name="EnemyPoint" parent="EnemyPoints" unique_id=1508234491 instance=ExtResource("4_3lljf")]
 position = Vector2(1407, 811)
 enemy_name = "Ellie"
+direction = 0
 
 [node name="NpcPoints" type="Node2D" parent="." unique_id=1301425038]
 

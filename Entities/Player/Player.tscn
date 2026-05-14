@@ -1,19 +1,7 @@
 [gd_scene format=3 uid="uid://dln8i38i54imj"]
 
 [ext_resource type="Script" uid="uid://bxdwfpc3382bh" path="res://Entities/Player/Player.gd" id="1_e5kic"]
-[ext_resource type="Texture2D" uid="uid://dm60cwgqkbxpn" path="res://Entities/Items/Classes/Male/back_hand/armour.png" id="2_061yh"]
-[ext_resource type="Texture2D" uid="uid://cg5dbrs73ahlg" path="res://Entities/Items/Classes/Temp/Art/armour.png" id="2_ww0jn"]
-[ext_resource type="Texture2D" uid="uid://18lgxhb27y6p" path="res://Entities/Items/Classes/Male/back_shoulder/armour.png" id="3_uw7o4"]
-[ext_resource type="Texture2D" uid="uid://da2l85ytqy1nu" path="res://Entities/Items/Classes/Male/back_thigh/armour.png" id="4_gallu"]
-[ext_resource type="Texture2D" uid="uid://b8lxocx5tpdrg" path="res://Entities/Items/Classes/Male/back_shin/armour.png" id="5_samso"]
-[ext_resource type="Texture2D" uid="uid://c7iipx5oprup5" path="res://Entities/Items/Classes/Male/back_foot/armour.png" id="6_hl213"]
-[ext_resource type="Texture2D" uid="uid://cb8cmprqqil8" path="res://Entities/Items/Classes/Male/chest/armour.png" id="7_5m37j"]
-[ext_resource type="Texture2D" uid="uid://qet7ut5pqygu" path="res://Entities/Items/Classes/Male/head/armour.png" id="8_e34i1"]
-[ext_resource type="Texture2D" uid="uid://d0ob507qoe0tb" path="res://Entities/Items/Classes/Male/front_thigh/armour.png" id="9_vcmon"]
-[ext_resource type="Texture2D" uid="uid://bvg78gk6rgbpa" path="res://Entities/Items/Classes/Male/front_shin/armour.png" id="10_h6pxy"]
-[ext_resource type="Texture2D" uid="uid://deunrnsevmu1w" path="res://Entities/Items/Classes/Male/front_foot/armour.png" id="11_l80rc"]
-[ext_resource type="Texture2D" uid="uid://dudssx8xgntaw" path="res://Entities/Items/Classes/Male/front_shoulder/armour.png" id="12_l2mqv"]
-[ext_resource type="Texture2D" uid="uid://cio4lih0exndb" path="res://Entities/Items/Classes/Male/front_hand/armour.png" id="13_mgqku"]
+[ext_resource type="PackedScene" uid="uid://btqmkf6wsl383" path="res://Entities/Models/Humanoid/Humanoid.tscn" id="2_ww0jn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ww0jn"]
 size = Vector2(180, 40)
@@ -21,86 +9,9 @@ size = Vector2(180, 40)
 [node name="Player" type="CharacterBody2D" unique_id=10596515]
 script = ExtResource("1_e5kic")
 
-[node name="Model" type="Node2D" parent="." unique_id=1385571394]
-scale = Vector2(0.25, 0.25)
+[node name="Base" type="Node2D" parent="." unique_id=1601786718]
 
-[node name="Body" type="Node2D" parent="Model" unique_id=1193740824]
-
-[node name="BackHand" type="Node2D" parent="Model/Body" unique_id=2121620194]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/BackHand" unique_id=95000523]
-texture = ExtResource("2_061yh")
-offset = Vector2(251, -785)
-
-[node name="BackShoulder" type="Node2D" parent="Model/Body" unique_id=958173657]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/BackShoulder" unique_id=1854020137]
-texture = ExtResource("3_uw7o4")
-offset = Vector2(161.5, -983)
-
-[node name="BackThigh" type="Node2D" parent="Model/Body" unique_id=1796747663]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/BackThigh" unique_id=372098952]
-texture = ExtResource("4_gallu")
-offset = Vector2(84, -580)
-
-[node name="BackShin" type="Node2D" parent="Model/Body" unique_id=671026453]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/BackShin" unique_id=1208009407]
-texture = ExtResource("5_samso")
-offset = Vector2(110, -277)
-
-[node name="BackFoot" type="Node2D" parent="Model/Body" unique_id=994641712]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/BackFoot" unique_id=1449636357]
-texture = ExtResource("6_hl213")
-offset = Vector2(176, -76)
-
-[node name="Chest" type="Node2D" parent="Model/Body" unique_id=450890415]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/Chest" unique_id=1470870124]
-texture = ExtResource("7_5m37j")
-offset = Vector2(-4, -942)
-
-[node name="Head" type="Node2D" parent="Model/Body" unique_id=253489630]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/Head" unique_id=751872203]
-texture = ExtResource("8_e34i1")
-offset = Vector2(21.5, -1292)
-
-[node name="FrontThigh" type="Node2D" parent="Model/Body" unique_id=1573453783]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/FrontThigh" unique_id=1036802260]
-texture = ExtResource("9_vcmon")
-offset = Vector2(-105, -571)
-
-[node name="FrontShin" type="Node2D" parent="Model/Body" unique_id=1964518883]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/FrontShin" unique_id=1266800252]
-texture = ExtResource("10_h6pxy")
-offset = Vector2(-199, -264)
-
-[node name="FrontFoot" type="Node2D" parent="Model/Body" unique_id=337676239]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/FrontFoot" unique_id=1731885022]
-texture = ExtResource("11_l80rc")
-offset = Vector2(-253, -55)
-
-[node name="FrontShoulder" type="Node2D" parent="Model/Body" unique_id=1575351474]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/FrontShoulder" unique_id=1638207313]
-texture = ExtResource("12_l2mqv")
-offset = Vector2(-200, -990)
-
-[node name="FrontHand" type="Node2D" parent="Model/Body" unique_id=970166995]
-
-[node name="Armour" type="Sprite2D" parent="Model/Body/FrontHand" unique_id=2040485764]
-texture = ExtResource("13_mgqku")
-offset = Vector2(-289, -769)
-
-[node name="Armour" type="Sprite2D" parent="Model" unique_id=1550599556]
-position = Vector2(-772, -672)
-texture = ExtResource("2_ww0jn")
+[node name="Humanoid" parent="Base" unique_id=1064279868 instance=ExtResource("2_ww0jn")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=894241408]
 position = Vector2(0, -20)
