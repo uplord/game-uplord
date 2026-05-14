@@ -1,7 +1,7 @@
 extends Node2D
 class_name RemotePlayer
 
-@onready var body = $Model/Body
+@onready var body = $Base/Model
 
 var is_local := false
 
@@ -13,7 +13,7 @@ func _physics_process(_delta):
 
 func set_direction(dir: int):
 	if body == null:
-		body = $Model/Body
+		body = $Base/Model
 
 	body.scale.x = dir
 

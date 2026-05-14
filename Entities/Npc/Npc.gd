@@ -2,7 +2,7 @@
 extends Node2D
 class_name Npc
 
-@onready var body = $Base/Humanoid
+@onready var body = $Base/Model
 
 
 func _physics_process(_delta):
@@ -10,7 +10,7 @@ func _physics_process(_delta):
 
 func set_direction(dir: int):
 	if body == null:
-		body = $Base/Humanoid
+		body = $Base/Model
 
 	body.scale.x = -1 if dir == 0 else 1
 

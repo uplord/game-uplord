@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dln8i38i54imj"]
 
 [ext_resource type="Script" uid="uid://bxdwfpc3382bh" path="res://Entities/Player/Player.gd" id="1_e5kic"]
-[ext_resource type="PackedScene" uid="uid://btqmkf6wsl383" path="res://Entities/Models/Humanoid/Humanoid.tscn" id="2_ww0jn"]
+[ext_resource type="PackedScene" uid="uid://bh3rwa5v6aq2o" path="res://Entities/Models/Model.tscn" id="2_ww0jn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ww0jn"]
 size = Vector2(180, 40)
@@ -11,7 +11,7 @@ script = ExtResource("1_e5kic")
 
 [node name="Base" type="Node2D" parent="." unique_id=1601786718]
 
-[node name="Humanoid" parent="Base" unique_id=1064279868 instance=ExtResource("2_ww0jn")]
+[node name="Model" parent="Base" unique_id=317984041 instance=ExtResource("2_ww0jn")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=894241408]
 position = Vector2(0, -20)

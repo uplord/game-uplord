@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://btqmkf6wsl383"]
 
 [ext_resource type="Texture2D" uid="uid://beeeghwoog08o" path="res://Entities/Models/Humanoid/Art/Male/back_hand/armour.png" id="1_3j5xw"]
+[ext_resource type="Script" uid="uid://jsddooxxtmtd" path="res://Entities/Models/Humanoid/Humanoid.gd" id="1_dtb42"]
 [ext_resource type="Texture2D" uid="uid://br81qqax1hcto" path="res://Entities/Models/Humanoid/Art/Male/back_shoulder/armour.png" id="2_dtb42"]
 [ext_resource type="Texture2D" uid="uid://bmb3bp0u7tusw" path="res://Entities/Models/Humanoid/Art/Male/back_thigh/armour.png" id="3_aemfn"]
 [ext_resource type="Texture2D" uid="uid://chutmudm017dv" path="res://Entities/Models/Humanoid/Art/Male/back_shin/armour.png" id="4_hnspk"]
@@ -14,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://bsdtrjb2f23gh" path="res://Entities/Models/Humanoid/Art/Male/front_hand/armour.png" id="12_ftajy"]
 
 [node name="Humanoid" type="Node2D" unique_id=1064279868]
+script = ExtResource("1_dtb42")
 
 [node name="Body" type="Node2D" parent="." unique_id=1037677127]
 scale = Vector2(0.25, 0.25)
@@ -154,7 +156,7 @@ position = Vector2(-123, 184)
 rest = Transform2D(1, 0, 0, 1, -123, 184)
 auto_calculate_length_and_angle = false
 length = 268.788
-bone_angle = 100.07798
+bone_angle = 100.077965
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Bones/Skeleton2D/Hip/FrontShoulder/FrontHand" unique_id=194805771]
 remote_path = NodePath("../../../../../../Body/FrontHand")
