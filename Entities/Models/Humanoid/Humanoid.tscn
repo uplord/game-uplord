@@ -76,6 +76,30 @@ tracks/4/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Bones/Skeleton2D/Hip/BackShoulder/BackHand:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Bones/Skeleton2D/Hip/FrontShoulder/FrontHand:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
 
 [sub_resource type="Animation" id="Animation_aemfn"]
 resource_name = "idle"
@@ -95,7 +119,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [0.5585053606381855]
+"values": [0.0]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -107,7 +131,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0821041362364843]
+"values": [0.0]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -119,7 +143,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [-1.1868238913561442]
+"values": [0.0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -145,6 +169,30 @@ tracks/4/keys = {
 "update": 0,
 "values": [0.6981317007977318]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Bones/Skeleton2D/Hip/FrontShoulder/FrontHand:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.9773843811168246]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Bones/Skeleton2D/Hip/BackShoulder/BackHand:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.9424777960769379]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3vyth"]
 _data = {
@@ -159,25 +207,12 @@ animation = &"idle"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_aemfn"]
 animation = &"run"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_hnspk"]
-advance_mode = 2
-advance_condition = &"idle"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_3vyth"]
-advance_mode = 2
-advance_condition = &"run"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_knlen"]
-advance_mode = 2
-advance_condition = &"idle"
-
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_lf42i"]
 states/idle/node = SubResource("AnimationNodeAnimation_dtb42")
 states/idle/position = Vector2(368.5, 100)
 states/run/node = SubResource("AnimationNodeAnimation_aemfn")
 states/run/position = Vector2(546, 101.25)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_hnspk"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_3vyth"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_knlen")]
-graph_offset = Vector2(-205.30476, 90.539986)
+graph_offset = Vector2(-205.30476, -82.99501)
 
 [node name="Humanoid" type="Node2D" unique_id=1064279868]
 script = ExtResource("1_dtb42")
@@ -187,7 +222,7 @@ scale = Vector2(0.25, 0.25)
 
 [node name="BackHand" type="Node2D" parent="Body" unique_id=1024107481]
 position = Vector2(303.69662, -939.0213)
-rotation = -0.6632251
+rotation = -1.6057029
 
 [node name="Skin" type="Sprite2D" parent="Body/BackHand" unique_id=824252053]
 position = Vector2(200.75, -859.5)
@@ -205,7 +240,6 @@ offset = Vector2(-107.5, 1140.5)
 
 [node name="BackThigh" type="Node2D" parent="Body" unique_id=837033051]
 position = Vector2(86.75, -678.5)
-rotation = -1.1868238
 
 [node name="Skin" type="Sprite2D" parent="Body/BackThigh" unique_id=785102209]
 position = Vector2(86.75, -678.5)
@@ -213,8 +247,7 @@ texture = ExtResource("3_aemfn")
 offset = Vector2(-85.5, 803)
 
 [node name="BackSkin" type="Node2D" parent="Body" unique_id=1628886575]
-position = Vector2(351.75098, -601.6316)
-rotation = -1.1868238
+position = Vector2(114.75, -404)
 
 [node name="Skin" type="Sprite2D" parent="Body/BackSkin" unique_id=1003425807]
 position = Vector2(114.75, -404)
@@ -222,8 +255,7 @@ texture = ExtResource("4_hnspk")
 offset = Vector2(-115.5, 557)
 
 [node name="BackFoot" type="Node2D" parent="Body" unique_id=1917527986]
-position = Vector2(640.8357, -481.59814)
-rotation = -1.1868238
+position = Vector2(111.75, -91)
 
 [node name="Skin" type="Sprite2D" parent="Body/BackFoot" unique_id=199732716]
 position = Vector2(111.75, -91)
@@ -248,7 +280,6 @@ offset = Vector2(-30.5, 1095)
 
 [node name="FrontThigh" type="Node2D" parent="Body" unique_id=1507431230]
 position = Vector2(-64.25, -670.5)
-rotation = 0.55850536
 
 [node name="Skin" type="Sprite2D" parent="Body/FrontThigh" unique_id=1922675362]
 position = Vector2(-64.25, -670.5)
@@ -256,9 +287,7 @@ texture = ExtResource("8_32cg1")
 offset = Vector2(27.5, 796)
 
 [node name="FrontShin" type="Node2D" parent="Body" unique_id=142443223]
-position = Vector2(-292.76837, -487.84088)
-rotation = 1.6406095
-scale = Vector2(0.99999994, 0.99999994)
+position = Vector2(-161.25, -394.5)
 
 [node name="Skin" type="Sprite2D" parent="Body/FrontShin" unique_id=99184146]
 position = Vector2(-161.25, -394.5)
@@ -266,9 +295,7 @@ texture = ExtResource("9_ymjlh")
 offset = Vector2(127.5, 551.5)
 
 [node name="FrontFoot" type="Node2D" parent="Body" unique_id=1336982610]
-position = Vector2(-610.59045, -587.5038)
-rotation = 1.6406095
-scale = Vector2(0.99999994, 0.99999994)
+position = Vector2(-238.5, -70.5)
 
 [node name="Skin" type="Sprite2D" parent="Body/FrontFoot" unique_id=1998873261]
 texture = ExtResource("10_o1lnn")
@@ -286,8 +313,8 @@ offset = Vector2(76.25, 1143.5)
 
 [node name="FrontHand" type="Node2D" parent="Body" unique_id=676752648]
 position = Vector2(-347.99634, -991.8607)
-rotation = 0.6981317
-scale = Vector2(0.9999998, 0.9999998)
+rotation = -0.27925268
+scale = Vector2(0.99999976, 0.99999976)
 
 [node name="Skin" type="Sprite2D" parent="Body/FrontHand" unique_id=1854005405]
 position = Vector2(-258.5, -869.75)
@@ -333,6 +360,7 @@ remote_path = NodePath("../../../../../Body/FrontShoulder")
 
 [node name="FrontHand" type="Bone2D" parent="Bones/Skeleton2D/Hip/FrontShoulder" unique_id=693680663]
 position = Vector2(-123, 184)
+scale = Vector2(0.99999994, 0.99999994)
 rest = Transform2D(1, 0, 0, 1, -123, 184)
 auto_calculate_length_and_angle = false
 length = 268.788

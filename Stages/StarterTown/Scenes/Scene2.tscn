@@ -1,19 +1,24 @@
 [gd_scene format=3 uid="uid://r8cd2phd0che"]
 
-[ext_resource type="Texture2D" uid="uid://duaj2f1py1qfo" path="res://Stages/StarterTown/Art/scene-1.png" id="1_54d35"]
+[ext_resource type="Texture2D" uid="uid://dbty35bs0xawr" path="res://Stages/StarterTown/Art/starter.png" id="1_657mg"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_5mq8b"]
-[ext_resource type="PackedScene" uid="uid://f1hrl6krk8vx" path="res://Entities/Teleports/NpcPoint/NpcPoint.tscn" id="3_657mg"]
+[ext_resource type="PackedScene" uid="uid://f1hrl6krk8vx" path="res://Entities/Points/NpcPoint/NpcPoint.tscn" id="3_657mg"]
 
 [node name="Scene2" type="Node2D" unique_id=321670176]
 
 [node name="Background" type="Sprite2D" parent="." unique_id=333577954]
-texture = ExtResource("1_54d35")
+texture = ExtResource("1_657mg")
 centered = false
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1883757195]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D" unique_id=193396428]
+polygon = PackedVector2Array(-58, -109, 1664, -67, 1654, 417, 730, 367, -60, 395)
 
 [node name="Teleports" type="Node2D" parent="." unique_id=1429842619]
 
 [node name="Teleport1" parent="Teleports" unique_id=1394364578 instance=ExtResource("3_5mq8b")]
-position = Vector2(198, 669)
+position = Vector2(114, 803)
 target_stage = "StarterTown"
 target_scene = "Scene1"
 target_teleport = "Teleport3"
@@ -21,7 +26,7 @@ exit_direction = 0
 teleport_direction = 7
 
 [node name="Teleport2" parent="Teleports" unique_id=555847590 instance=ExtResource("3_5mq8b")]
-position = Vector2(1306, 429)
+position = Vector2(1476, 701)
 target_stage = "TestTown"
 target_scene = "Scene1"
 target_teleport = ""
@@ -30,6 +35,18 @@ teleport_direction = 4
 [node name="NpcPoints" type="Node2D" parent="." unique_id=1388693167]
 
 [node name="NpcPoint" parent="NpcPoints" unique_id=1508234491 instance=ExtResource("3_657mg")]
-position = Vector2(1054, 806)
+position = Vector2(772, 456)
 npc_name = "Jodie"
 direction = 0
+
+[node name="NpcPoint2" parent="NpcPoints" unique_id=185866399 instance=ExtResource("3_657mg")]
+position = Vector2(978, 418)
+npc_name = "Jodie"
+direction = 0
+npc_scale = 0.9
+
+[node name="NpcPoint3" parent="NpcPoints" unique_id=193951728 instance=ExtResource("3_657mg")]
+position = Vector2(540, 438)
+npc_name = "Jodie"
+npc_state = 1
+npc_scale = 1.05

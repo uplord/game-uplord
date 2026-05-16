@@ -36,26 +36,3 @@ func _on_remote_player_ready() -> void:
 		return
 
 	remote_player.scale = Vector2(player_scale, player_scale)
-
-
-func set_enemy(p: Enemy) -> void:
-	enemy = p
-	_on_enemy_ready()
-
-
-func _on_enemy_ready() -> void:
-	if not enemy:
-		return
-
-	enemy.scale = Vector2(player_scale, player_scale)
-	
-func set_npc(p: Npc) -> void:
-	npc = p
-	_on_npc_ready()
-
-
-func _on_npc_ready() -> void:
-	if not npc:
-		return
-
-	npc.scale = Vector2(player_scale, player_scale)

@@ -65,13 +65,29 @@ func _input(event):
 		return
 
 	if event.is_action_pressed("Click"):
+
 		var hovered = get_viewport().gui_get_hovered_control()
 		if hovered:
 			return
 
-		target = get_parent().to_local(get_global_mouse_position())
-		has_target = true
+		var mouse_pos = get_global_mouse_position()
 
+		# 🔥 CHECK IF CLICK IS ON A COLLIDER
+		var space_state = get_world_2d().direct_space_state
+
+		var query = PhysicsPointQueryParameters2D.new()
+		query.position = mouse_pos
+		query.collide_with_areas = false
+		query.collide_with_bodies = true
+
+		var result = space_state.intersect_point(query, 1)
+
+		# If we hit a collision shape (like your CollisionPolygon2D wall), block movement
+		if result.size() > 0:
+			return
+
+		target = get_parent().to_local(mouse_pos)
+		has_target = true
 
 # -------------------------
 # MOVEMENT
@@ -86,12 +102,25 @@ func _physics_process(_delta):
 		return
 
 	if has_target and position.distance_to(target) > 10:
+
 		var dir = position.direction_to(target)
 		velocity = dir * speed
-		move_and_slide()
 
 		var facing = -1 if velocity.x < 0 else 1
 		body.scale.x = facing
+
+		move_and_slide()
+
+		# CHECK COLLISIONS
+		for i in range(get_slide_collision_count()):
+
+			var collision = get_slide_collision(i)
+
+			if collision:
+				velocity = Vector2.ZERO
+				has_target = false
+				play_anim("idle")
+				return
 
 		play_anim("run")
 
@@ -103,6 +132,7 @@ func _physics_process(_delta):
 			"scene": SceneManager.current_scene,
 			"instance": SceneManager.current_instance,
 		})
+
 	else:
 		velocity = Vector2.ZERO
 		play_anim("idle")
@@ -176,4 +206,4 @@ func reset_teleport_state():
 func _apply_z_sort():
 	var base = int(global_position.y)
 
-	z_index = base
+	z_index = base + 1

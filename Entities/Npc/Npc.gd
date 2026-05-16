@@ -1,4 +1,3 @@
-
 extends Node2D
 class_name Npc
 
@@ -7,11 +6,9 @@ class_name Npc
 var animation_tree: AnimationTree
 var animation_state: AnimationNodeStateMachinePlayback
 var current_anim := ""
+var pending_state := ""
 
 func _ready():
-
-	# Wait for dynamic model to be instanced
-	await get_tree().process_frame
 
 	var model = body.get_model_root()
 
@@ -25,15 +22,21 @@ func _ready():
 		push_error("AnimationTree not found inside model")
 		return
 
-	animation_tree.active = true
 	animation_state = animation_tree["parameters/playback"]
 
-	play_anim("run")
+	# IMPORTANT:
+	# start state BEFORE activation
+	if pending_state != "":
+		current_anim = pending_state
+		animation_state.start(pending_state)
+
+	animation_tree.active = true
 
 # -------------------------
 # ANIMATION HANDLER
 # -------------------------
 func play_anim(anim_name: String) -> void:
+
 	if animation_state == null:
 		return
 
@@ -47,12 +50,17 @@ func _physics_process(_delta):
 	_apply_z_sort()
 
 func set_direction(dir: int):
-	if body == null:
-		body = $Base/Model
+	$Base.scale.x = -1 if dir == 0 else 1
 
-	body.scale.x = -1 if dir == 0 else 1
+func set_state(state):
+
+	pending_state = state
+
+	# already initialized
+	if animation_state != null:
+		play_anim(state)
 
 func _apply_z_sort():
-	var base = int(global_position.y)
 
+	var base = int(global_position.y)
 	z_index = base

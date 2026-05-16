@@ -126,16 +126,6 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"id": client_id,
 				"remote_players": server_manager.get_instance_remote_players(stage, instance)
 			})
-			
-			server_manager.broadcast_to_instance(stage, instance, {
-				"type": "s_enemies",
-				"id": client_id,
-			})
-			
-			server_manager.broadcast_to_instance(stage, instance, {
-				"type": "s_npcs",
-				"id": client_id,
-			})
 
 		"c_move_player":
 			if not _validate_move_data(client_id, data):
@@ -241,16 +231,9 @@ func handle_server_packet(client_id: int, data: Dictionary):
 				"id": client_id,
 				"remote_players": server_manager.get_instance_remote_players(target_stage, instance)
 			})
-			
-			server_manager.broadcast_to_instance(target_stage, instance, {
-				"type": "s_enemies",
-				"id": client_id,
-			})
-			
-			server_manager.broadcast_to_instance(target_stage, instance, {
-				"type": "s_npcs",
-				"id": client_id,
-			})
+ 
+		"c_request_sync":
+			pass
 
 
 # ==================================================
@@ -280,11 +263,11 @@ func handle_client_packet(data: Dictionary):
 		"s_remote_players":
 			SceneManager.spawn_remote_players(data.remote_players)
 			
-		"s_enemies":
-			SceneManager.spawn_enemies()
+		#"s_enemies":
+			#SceneManager.spawn_enemies()
 
-		"s_npcs":
-			SceneManager.spawn_npcs()
+		#"s_npcs":
+			#SceneManager.spawn_npcs()
 
 		"s_teleport_player":
 

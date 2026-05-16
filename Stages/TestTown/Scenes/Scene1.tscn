@@ -1,9 +1,11 @@
 [gd_scene format=3 uid="uid://c3der0w8xk38s"]
 
-[ext_resource type="Texture2D" uid="uid://coqsknhmn6mhb" path="res://Stages/TestTown/Art/scene-1.png" id="1_o1isr"]
-[ext_resource type="PackedScene" uid="uid://wpsjxeghnhop" path="res://Entities/Teleports/SpawnPoint/SpawnPoint.tscn" id="2_npn0u"]
+[ext_resource type="Texture2D" uid="uid://bbs4pnxfggibg" path="res://Stages/TestTown/Art/starter.png" id="1_o1isr"]
+[ext_resource type="PackedScene" uid="uid://wpsjxeghnhop" path="res://Entities/Points/SpawnPoint/SpawnPoint.tscn" id="2_npn0u"]
 [ext_resource type="PackedScene" uid="uid://cqwg4n44fyn5t" path="res://Entities/Teleports/Teleport/Teleport.tscn" id="3_jus1r"]
+[ext_resource type="PackedScene" uid="uid://c33s1ts2nd67y" path="res://Entities/Points/EnemyPoint/EnemyPoint.tscn" id="5_jus1r"]
 [ext_resource type="Script" uid="uid://dtvs8c0g73ekt" path="res://Entities/Teleports/Button/Button.gd" id="5_npn0u"]
+[ext_resource type="PackedScene" uid="uid://f1hrl6krk8vx" path="res://Entities/Points/NpcPoint/NpcPoint.tscn" id="6_jus1r"]
 
 [node name="Scene1" type="Node2D" unique_id=321670176]
 
@@ -11,10 +13,15 @@
 texture = ExtResource("1_o1isr")
 centered = false
 
+[node name="Area2D" type="StaticBody2D" parent="." unique_id=1335669676]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D" unique_id=1407064792]
+polygon = PackedVector2Array(-31, -44, 1637, -52, 1637, 392, 1289, 358, 801, 337, 453, 347, 155, 367, -32, 409)
+
 [node name="Teleports" type="Node2D" parent="." unique_id=1429842619]
 
 [node name="Teleport1" parent="Teleports" unique_id=1394364578 instance=ExtResource("3_jus1r")]
-position = Vector2(804, 809)
+position = Vector2(800, 812)
 target_stage = "StarterTown"
 target_scene = "Scene2"
 target_teleport = "Teleport2"
@@ -44,3 +51,23 @@ script = ExtResource("5_npn0u")
 target_stage = "TestTown"
 target_scene = "Scene1"
 target_teleport = ""
+
+[node name="EnemyPoints" type="Node2D" parent="." unique_id=1189433545]
+
+[node name="EnemyPoint" parent="EnemyPoints" unique_id=1508234491 instance=ExtResource("5_jus1r")]
+position = Vector2(1251, 474)
+enemy_name = "Ellie"
+direction = 0
+enemy_state = 1
+
+[node name="EnemyPoint2" parent="EnemyPoints" unique_id=781845781 instance=ExtResource("5_jus1r")]
+position = Vector2(284, 487)
+enemy_name = "Ellie"
+enemy_scale = 1.5
+
+[node name="NpcPoints" type="Node2D" parent="." unique_id=856133590]
+
+[node name="NpcPoint" parent="NpcPoints" unique_id=864444601 instance=ExtResource("6_jus1r")]
+position = Vector2(1436, 832)
+npc_name = "Jodie"
+direction = 0

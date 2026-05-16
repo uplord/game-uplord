@@ -35,10 +35,13 @@ func _on_body_entered(body):
 			dir
 		)
 	)
-	
+
+
 func get_texture_from_direction(dir: TeleportDirection) -> Texture2D:
+	if dir == TeleportDirection.BASE:
+		return null
+
 	var name_map := {
-		TeleportDirection.BASE: "Base",
 		TeleportDirection.UP: "Up",
 		TeleportDirection.DOWN: "Down",
 		TeleportDirection.LEFT: "Left",
@@ -48,5 +51,11 @@ func get_texture_from_direction(dir: TeleportDirection) -> Texture2D:
 		TeleportDirection.DOWNLEFT: "DownLeft",
 		TeleportDirection.DOWNRIGHT: "DownRight",
 	}
+
 	var file_name = name_map.get(dir, "Up")
-	return load("res://Entities/Teleports/Teleport/Art/%s.png" % file_name)
+	var path = "res://Entities/Teleports/Teleport/Art/%s.png" % file_name
+
+	if ResourceLoader.exists(path):
+		return load(path) as Texture2D
+
+	return null

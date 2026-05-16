@@ -9,7 +9,8 @@ func _ready():
 	pass
 
 func _physics_process(_delta):
-	_apply_z_sort()
+	pass
+	#_apply_z_sort()
 
 func set_direction(dir: int):
 	if body == null:
@@ -17,7 +18,7 @@ func set_direction(dir: int):
 
 	body.scale.x = dir
 
-func _apply_z_sort():
-	var base = int(global_position.y)
-
-	z_index = base
+#func _apply_z_sort():
+	#var base = int(global_position.y)
+#
+	#z_index = base

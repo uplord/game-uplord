@@ -22,8 +22,13 @@ var scene_transitioning := false
 var last_remote_snapshot: Dictionary = {}
 var instance_player_count: int = 0
 
-# { peer_id: Node2D }
+# runtime npc states for CURRENT area only
+var npc_states := {}
+var enemy_states := {}
 
+# ==================================================
+# SETUP
+# ==================================================
 func setup(scene_container: Node):
 	container = scene_container
 
@@ -34,6 +39,43 @@ func unload_stage() -> void:
 	for child in container.get_children():
 		child.queue_free()
 
+# ==================================================
+# NPC STATE
+# ==================================================
+func _get_npc_key(npc_id: String) -> String:
+	return "%s:%s:%s" % [
+		current_stage,
+		current_scene,
+		npc_id
+	]
+
+func save_npc_state(npc_id: String, state: String):
+	npc_states[_get_npc_key(npc_id)] = state
+
+func get_npc_state(npc_id: String, default_state: String) -> String:
+	return npc_states.get(
+		_get_npc_key(npc_id),
+		default_state
+	)
+
+# ==================================================
+# Enemy STATE
+# ==================================================
+func _get_enemy_key(enemy_id: String) -> String:
+	return "%s:%s:%s" % [
+		current_stage,
+		current_scene,
+		enemy_id
+	]
+
+func save_enemy_state(enemy_id: String, state: String):
+	enemy_states[_get_enemy_key(enemy_id)] = state
+
+func get_enemy_state(enemy_id: String, default_state: String) -> String:
+	return npc_states.get(
+		_get_enemy_key(enemy_id),
+		default_state
+	)
 
 # ==================================================
 # STAGE LOADING
@@ -56,7 +98,11 @@ func load_stage(spawn_position := Vector2.INF):
 		selected_stage.queue_free()
 		selected_stage = null
 
-	var stage_path = "res://Stages/%s/%s.tscn" % [current_stage, current_stage]
+	var stage_path = "res://Stages/%s/%s.tscn" % [
+		current_stage,
+		current_stage
+	]
+
 	var packed_scene = load(stage_path)
 
 	if packed_scene == null:
@@ -64,14 +110,18 @@ func load_stage(spawn_position := Vector2.INF):
 		return null
 
 	selected_stage = packed_scene.instantiate()
+
 	container.add_child(selected_stage)
 
+	# ==================================================
 	# PLAYER
+	# ==================================================
 	if player == null:
 		player = player_scene.instantiate()
 		player.add_to_group("player")
-	
+
 	var player_parent = selected_stage.get_node_or_null("Player")
+
 	if player_parent == null:
 		player_parent = Node2D.new()
 		player_parent.name = "Player"
@@ -81,6 +131,7 @@ func load_stage(spawn_position := Vector2.INF):
 		player.get_parent().remove_child(player)
 
 	player_parent.add_child(player)
+
 	selected_stage.set_player(player)
 
 	if spawn_position == Vector2.INF:
@@ -89,12 +140,19 @@ func load_stage(spawn_position := Vector2.INF):
 	if spawn_position != Vector2.INF:
 		player.global_position = spawn_position
 
+	# ==================================================
 	# SPAWN
+	# ==================================================
 	if spawn_position == Vector2.INF and not spawn_requested:
 		spawn_requested = true
-		ServerManager.send_to_server({ "type": "c_spawn_player" })
+
+		ServerManager.send_to_server({
+			"type": "c_spawn_player"
+		})
 
 	_load_scene(current_scene)
+	spawn_npcs()
+	spawn_enemies()
 
 	var remote_parent = Node2D.new()
 	remote_parent.name = "RemotePlayers"
@@ -108,6 +166,7 @@ func load_stage(spawn_position := Vector2.INF):
 	GameManager.update_ui()
 
 func _load_scene(scene_name: String):
+
 	if selected_stage == null:
 		return
 
@@ -116,7 +175,11 @@ func _load_scene(scene_name: String):
 		if child.name.begins_with("Scene"):
 			child.queue_free()
 
-	var path = "res://Stages/%s/Scenes/%s.tscn" % [current_stage, scene_name]
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [
+		current_stage,
+		scene_name
+	]
+
 	var packed = load(path)
 
 	if packed == null:
@@ -125,39 +188,67 @@ func _load_scene(scene_name: String):
 
 	var scene = packed.instantiate()
 	scene.name = scene_name
+	
+	var teleport_parent = scene.get_node_or_null("Teleports")
+	for teleport in teleport_parent.get_children():
+		if teleport is Area2D:
+			teleport.scale = Vector2(selected_stage.player_scale, selected_stage.player_scale)
+
 	selected_stage.add_child(scene)
 
+# ==================================================
+# PLAYER
+# ==================================================
 func respawn_player():
+
 	if not ServerManager.is_ready():
 		print("Cannot respawn: server not ready")
 		return
 
 	var same_location = (
-		current_stage == default_stage and
-		current_scene == default_scene
+		current_stage == default_stage
+		and current_scene == default_scene
 	)
 
 	if same_location:
-		ServerManager.send_to_server({ "type": "c_spawn_player" })
+
+		ServerManager.send_to_server({
+			"type": "c_spawn_player"
+		})
+
 	else:
+
 		spawn_requested = false
 		current_stage = default_stage
 		current_scene = default_scene
 
+		# clear npc runtime states when changing area
+		npc_states.clear()
+
 		load_stage(Vector2.INF)
 
-func apply_teleport(stage: String, scene: String, position: Vector2, exit_direction: Vector2, instance := 1):
+func apply_teleport(
+	stage: String,
+	scene: String,
+	position: Vector2,
+	exit_direction: Vector2,
+	instance := 1
+):
+
 	if player == null:
 		return
 
 	var stage_changed := stage != current_stage
 	var scene_changed := scene != current_scene
 
+	# clear npc states if leaving area
+	if stage_changed or scene_changed:
+		npc_states.clear()
+
 	current_stage = stage
 	current_scene = scene
 	current_instance = instance
 
-	# 🔥 IMPORTANT: reload if EITHER changes
 	if stage_changed or scene_changed:
 		load_stage(position)
 	else:
@@ -168,7 +259,14 @@ func apply_teleport(stage: String, scene: String, position: Vector2, exit_direct
 
 	GameManager.update_ui()
 
-func teleport_player(target_stage: String, target_scene: String, target_teleport: String, exit_direction := Vector2.RIGHT, allow_respawn: bool = false):
+func teleport_player(
+	target_stage: String,
+	target_scene: String,
+	target_teleport: String,
+	exit_direction := Vector2.RIGHT,
+	allow_respawn: bool = false
+):
+
 	if scene_transitioning:
 		return
 
@@ -178,16 +276,19 @@ func teleport_player(target_stage: String, target_scene: String, target_teleport
 	if player.spawn_protection or not player.can_teleport:
 		return
 
-	if (current_stage == target_stage && current_scene == target_scene && !allow_respawn):
+	if (
+		current_stage == target_stage
+		and current_scene == target_scene
+		and !allow_respawn
+	):
 		return
 
 	player.lock_teleport()
 	player.stop_movement()
 	player.play_anim("idle")
-	
+
 	await get_tree().process_frame
 
-	# send request to server ONLY
 	ServerManager.send_to_server({
 		"type": "c_teleport_player",
 		"stage": target_stage,
@@ -196,8 +297,16 @@ func teleport_player(target_stage: String, target_scene: String, target_teleport
 		"direction": exit_direction,
 	})
 
+# ==================================================
+# UTILITIES
+# ==================================================
 func get_spawn_points_for_room(stage: String, scene: String) -> Array:
-	var path = "res://Stages/%s/Scenes/%s.tscn" % [stage, scene]
+
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [
+		stage,
+		scene
+	]
+
 	var packed = load(path)
 
 	if packed == null:
@@ -206,6 +315,7 @@ func get_spawn_points_for_room(stage: String, scene: String) -> Array:
 	var temp_scene = packed.instantiate()
 
 	var spawn_parent = temp_scene.get_node_or_null("SpawnPoints")
+
 	if spawn_parent == null:
 		temp_scene.queue_free()
 		return []
@@ -217,10 +327,20 @@ func get_spawn_points_for_room(stage: String, scene: String) -> Array:
 			points.append(spawn.global_position)
 
 	temp_scene.queue_free()
+
 	return points
 
-func resolve_teleport_position(stage: String, scene: String, teleport_name: String) -> Vector2:
-	var path = "res://Stages/%s/Scenes/%s.tscn" % [stage, scene]
+func resolve_teleport_position(
+	stage: String,
+	scene: String,
+	teleport_name: String
+) -> Vector2:
+
+	var path = "res://Stages/%s/Scenes/%s.tscn" % [
+		stage,
+		scene
+	]
+
 	var packed = load(path)
 
 	if packed == null:
@@ -229,24 +349,34 @@ func resolve_teleport_position(stage: String, scene: String, teleport_name: Stri
 	var temp_scene = packed.instantiate()
 
 	if teleport_name != null and teleport_name != "":
-		var node = temp_scene.find_child(teleport_name, true, false)
+
+		var node = temp_scene.find_child(
+			teleport_name,
+			true,
+			false
+		)
+
 		if node:
 			var pos = node.global_position
 			temp_scene.queue_free()
 			return pos
 
 	temp_scene.queue_free()
+
 	return Vector2.ZERO
 
-
+# ==================================================
+# REMOTE PLAYERS
+# ==================================================
 func spawn_remote_players(data: Dictionary):
+
 	last_remote_snapshot = data
 
 	var parent = selected_stage.get_node_or_null("RemotePlayers")
+
 	if parent == null:
 		return
 
-	# 🔥 HARD RESET (CRITICAL FIX)
 	for child in parent.get_children():
 		child.queue_free()
 
@@ -262,77 +392,115 @@ func spawn_remote_players(data: Dictionary):
 		if typeof(p) != TYPE_DICTIONARY:
 			continue
 
-		if not p.has("stage") or not p.has("scene") or not p.has("instance") or not p.has("position"):
+		if not p.has("stage") \
+		or not p.has("scene") \
+		or not p.has("instance") \
+		or not p.has("position"):
 			continue
 
 		if p.stage != current_stage:
 			continue
+
 		if p.scene != current_scene:
 			continue
+
 		if p.instance != current_instance:
 			continue
 
 		var remote_player = remote_player_scene.instantiate()
+
 		remote_player.name = "RemotePlayer_%d" % client_id
 		remote_player.global_position = p.position
+
 		remote_player.set_direction(p.direction)
+
 		parent.add_child(remote_player)
+
 		selected_stage.set_remote_player(remote_player)
 
 	GameManager.update_ui()
 
+# ==================================================
+# ENEMIES
+# ==================================================
 func spawn_enemies():
+
 	if selected_stage == null:
 		return
 
 	var scene_root = selected_stage.get_node_or_null(current_scene)
-
 	if scene_root == null:
 		return
 
 	var enemy_points = scene_root.get_node_or_null("EnemyPoints")
-
 	if enemy_points == null:
 		return
 
 	for point in enemy_points.get_children():
+
 		if point is Area2D:
+
 			var enemy = enemy_scene.instantiate()
 			enemy.name = "Enemy_%s" % point.name
 			enemy.global_position = point.global_position
 			enemy.set_direction(point.direction)
+			
 			enemy_points.add_child(enemy)
-			selected_stage.set_enemy(enemy)
+			
+			var saved_state = get_enemy_state(
+				point.name,
+				point.get_state_name()
+			)
+			
+			enemy.set_state(saved_state)
+			var set_scale = selected_stage.player_scale * point.enemy_scale
+			enemy.body.scale = Vector2(set_scale, set_scale)
 
+
+# ==================================================
+# NPCS
+# ==================================================
 func spawn_npcs():
+
 	if selected_stage == null:
 		return
 
 	var scene_root = selected_stage.get_node_or_null(current_scene)
-
 	if scene_root == null:
 		return
 
 	var npc_points = scene_root.get_node_or_null("NpcPoints")
-
 	if npc_points == null:
 		return
 
 	for point in npc_points.get_children():
+
 		if point is Area2D:
+
 			var npc = npc_scene.instantiate()
 			npc.name = "Npc_%s" % point.name
 			npc.global_position = point.global_position
 			npc.set_direction(point.direction)
+			
 			npc_points.add_child(npc)
-			selected_stage.set_npc(npc)
 
+			var saved_state = get_npc_state(
+				point.name,
+				point.get_state_name()
+			)
 
+			npc.set_state(saved_state)
+			var set_scale = selected_stage.player_scale * point.npc_scale
+			npc.body.scale = Vector2(set_scale, set_scale)
+
+# ==================================================
+# PLAYER COUNT
+# ==================================================
 func get_local_instance_count() -> int:
 	return _count_from_snapshot(last_remote_snapshot)
 
-
 func _count_from_snapshot(snapshot: Dictionary) -> int:
+
 	var count := 0
 
 	for client_id in snapshot.keys():
